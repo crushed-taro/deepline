@@ -37,4 +37,8 @@ public class Member {
   @OneToMany
   @JoinColumn(name = "member_code")
   private List<MemberRole> memberRole;
+
+  public void changePassword(String newPassword) {
+    this.memberPassword = newPassword;
+  }
 }

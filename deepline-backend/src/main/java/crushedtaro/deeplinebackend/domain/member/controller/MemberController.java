@@ -1,5 +1,6 @@
 package crushedtaro.deeplinebackend.domain.member.controller;
 
+import crushedtaro.deeplinebackend.domain.member.dto.ResetPasswordDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,8 +33,13 @@ public class MemberController {
   }
 
   @PostMapping("/reset-password")
-  public ResponseEntity<BaseResponse<Void>> resetPassword(@RequestBody MemberDTO memberDTO) {
-    return null;
+  public ResponseEntity<BaseResponse<Void>> resetPassword(@RequestBody ResetPasswordDTO resetPasswordDTO) {
+
+    log.info("[MemberController] resetPassword : {}", resetPasswordDTO);
+
+    memberService.resetPassword(resetPasswordDTO);
+
+    return BaseResponseFactory.success(MemberStatus.RESET_PASSWORD_SUCCESS);
   }
 
   //    @GetMapping("/me")
