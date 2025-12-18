@@ -28,6 +28,8 @@ public class AuthController {
 
     SignupResponseDTO signupResponseDTO = authService.signup(member);
 
+    log.info("[AuthController] signup End");
+
     return BaseResponseFactory.create(signupResponseDTO.signupStatus(), signupResponseDTO);
   }
 
@@ -36,6 +38,8 @@ public class AuthController {
     log.info("[AuthController] login member: {}", memberDTO);
 
     TokenDTO loginResponseDTO = authService.login(memberDTO);
+
+    log.info("[AuthController] login End");
 
     return BaseResponseFactory.success(loginResponseDTO.tokenStatus(), loginResponseDTO);
   }

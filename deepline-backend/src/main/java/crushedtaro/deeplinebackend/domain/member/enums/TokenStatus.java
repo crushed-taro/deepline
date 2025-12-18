@@ -10,8 +10,8 @@ import crushedtaro.deeplinebackend.domain.common.ResponseStatus;
 @Getter
 @RequiredArgsConstructor
 public enum TokenStatus implements ResponseStatus {
-  SIGNUP_SUCCESS(HttpStatus.CREATED, "SIGNUP_001", "회원가입이 성공적으로 완료되었습니다."),
-  SIGNUP_FALSE(HttpStatus.BAD_REQUEST, "SIGNUP_002", "회원가입에 실패하였습니다."),
+  LOGIN_SUCCESS(HttpStatus.OK, "LOGIN_001", "로그인이 성공적으로 완료되었습니다."),
+  LOGIN_FALSE(HttpStatus.BAD_REQUEST, "LOGIN_002", "로그인에 실패하였습니다."),
   ;
 
   private final HttpStatus status;

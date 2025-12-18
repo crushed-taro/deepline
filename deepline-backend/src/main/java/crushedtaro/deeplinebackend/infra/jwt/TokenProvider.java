@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import crushedtaro.deeplinebackend.domain.member.dto.TokenDTO;
 import crushedtaro.deeplinebackend.domain.member.entity.Member;
 import crushedtaro.deeplinebackend.domain.member.entity.MemberRole;
+import crushedtaro.deeplinebackend.domain.member.enums.TokenStatus;
 
 @Component
 @Slf4j
@@ -78,7 +79,11 @@ public class TokenProvider {
     log.info("[TokenProvider] generateTokenDTO() End");
 
     return new TokenDTO(
-        BEARER_TYPE, member.getMemberName(), accessToken, accessTokenExpiresIn.getTime(), null);
+        BEARER_TYPE,
+        member.getMemberName(),
+        accessToken,
+        accessTokenExpiresIn.getTime(),
+        TokenStatus.LOGIN_SUCCESS);
   }
 
   public boolean validateToken(String token) {

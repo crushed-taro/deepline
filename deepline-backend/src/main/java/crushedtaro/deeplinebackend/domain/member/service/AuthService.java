@@ -69,7 +69,7 @@ public class AuthService {
       throw new RuntimeException("User Not Found");
     }
 
-    if (!passwordEncoder.matches(member.memberPassword(), registedUser.getMemberId())) {
+    if (!passwordEncoder.matches(member.memberPassword(), registedUser.getMemberPassword())) {
       log.warn("[AuthService] Login() Password Match Failed!");
       throw new RuntimeException("Password Match Failed");
     }
