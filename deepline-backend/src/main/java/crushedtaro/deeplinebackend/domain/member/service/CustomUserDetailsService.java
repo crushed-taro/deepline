@@ -34,7 +34,10 @@ public class CustomUserDetailsService implements UserDetailsService {
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     log.info("[CustomUserDetailsService] loadUserByUsername -> username: {}", username);
 
-    Member memberEntity = memberRepository.findByMemberId(username);
+    Member memberEntity =
+        memberRepository
+            .findByMemberId(username)
+            .orElseThrow(() -> new RuntimeException("로그인 유저 정보를 찾을 수 없습니다."));
 
     List<GrantedAuthority> authorities = new ArrayList<>();
     for (MemberRole role : memberEntity.getMemberRole()) {

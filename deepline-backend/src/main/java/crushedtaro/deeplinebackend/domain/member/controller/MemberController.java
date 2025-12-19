@@ -1,6 +1,5 @@
 package crushedtaro.deeplinebackend.domain.member.controller;
 
-import crushedtaro.deeplinebackend.domain.member.dto.ResetPasswordDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,6 +10,8 @@ import crushedtaro.deeplinebackend.domain.common.BaseResponse;
 import crushedtaro.deeplinebackend.domain.common.BaseResponseFactory;
 import crushedtaro.deeplinebackend.domain.member.dto.FindIdDTO;
 import crushedtaro.deeplinebackend.domain.member.dto.MemberDTO;
+import crushedtaro.deeplinebackend.domain.member.dto.MemberResponseDTO;
+import crushedtaro.deeplinebackend.domain.member.dto.ResetPasswordDTO;
 import crushedtaro.deeplinebackend.domain.member.enums.MemberStatus;
 import crushedtaro.deeplinebackend.domain.member.service.MemberService;
 
@@ -33,7 +34,8 @@ public class MemberController {
   }
 
   @PostMapping("/reset-password")
-  public ResponseEntity<BaseResponse<Void>> resetPassword(@RequestBody ResetPasswordDTO resetPasswordDTO) {
+  public ResponseEntity<BaseResponse<Void>> resetPassword(
+      @RequestBody ResetPasswordDTO resetPasswordDTO) {
 
     log.info("[MemberController] resetPassword : {}", resetPasswordDTO);
 
@@ -42,11 +44,15 @@ public class MemberController {
     return BaseResponseFactory.success(MemberStatus.RESET_PASSWORD_SUCCESS);
   }
 
-  //    @GetMapping("/me")
-  //    public ResponseEntity<BaseResponse<MemberResposenDTO>> getMyInfo() {
-  //        // SecuriryContextHolder에서 현재 로그인한 유저 정보 꺼내서 조회
-  //        return null;
-  //    }
+  @GetMapping("/me")
+  public ResponseEntity<BaseResponse<MemberResponseDTO>> getMyInfo() {
+
+    log.info("[MemberController] getMyInfo");
+
+    MemberResponseDTO memberResponseDTO = memberService.getMyInfo();
+
+    return BaseResponseFactory.success(MemberStatus.READ_PROFILE_SUCCESS, memberResponseDTO);
+  }
 
   @PutMapping("/me")
   public ResponseEntity<BaseResponse<Void>> updateMyInfo(@RequestBody MemberDTO memberDTO) {

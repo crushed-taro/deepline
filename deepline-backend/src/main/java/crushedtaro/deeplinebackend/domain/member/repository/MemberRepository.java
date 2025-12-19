@@ -9,12 +9,12 @@ import crushedtaro.deeplinebackend.domain.member.entity.Member;
 public interface MemberRepository extends JpaRepository<Member, Integer> {
   boolean existsByMemberEmail(String s);
 
-  Member findByMemberId(String username);
+  Optional<Member> findByMemberId(String username);
 
   boolean existsByMemberId(String s);
 
   Optional<Member> findByMemberNameAndMemberEmail(String memberName, String memberEmail);
 
-  Optional<Member> findByMemberIdAndMemberNameAndMemberEmail(String memberId, String memberName, String memberEmail);
-
+  Optional<Member> findByMemberIdAndMemberNameAndMemberEmail(
+      String memberId, String memberName, String memberEmail);
 }

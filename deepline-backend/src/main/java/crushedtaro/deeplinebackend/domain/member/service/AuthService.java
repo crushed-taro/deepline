@@ -62,7 +62,10 @@ public class AuthService {
     log.info("[AuthService] login() START");
     log.info("[AuthService] member : {}", member);
 
-    Member registedUser = memberRepository.findByMemberId(member.memberId());
+    Member registedUser =
+        memberRepository
+            .findByMemberId(member.memberId())
+            .orElseThrow(() -> new RuntimeException("사용자가 없습니다."));
 
     if (!memberRepository.existsByMemberId(member.memberId())) {
       log.warn("[AuthService] Login() Required User Not Found!");
