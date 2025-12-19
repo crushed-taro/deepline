@@ -8,10 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import crushedtaro.deeplinebackend.domain.common.BaseResponse;
 import crushedtaro.deeplinebackend.domain.common.BaseResponseFactory;
-import crushedtaro.deeplinebackend.domain.member.dto.FindIdDTO;
-import crushedtaro.deeplinebackend.domain.member.dto.MemberDTO;
-import crushedtaro.deeplinebackend.domain.member.dto.MemberResponseDTO;
-import crushedtaro.deeplinebackend.domain.member.dto.ResetPasswordDTO;
+import crushedtaro.deeplinebackend.domain.member.dto.*;
 import crushedtaro.deeplinebackend.domain.member.enums.MemberStatus;
 import crushedtaro.deeplinebackend.domain.member.service.MemberService;
 
@@ -55,8 +52,14 @@ public class MemberController {
   }
 
   @PutMapping("/me")
-  public ResponseEntity<BaseResponse<Void>> updateMyInfo(@RequestBody MemberDTO memberDTO) {
-    return null;
+  public ResponseEntity<BaseResponse<Void>> updateMyInfo(
+      @RequestBody UpdateMemberDTO updateMemberDTO) {
+
+    log.info("[MemberController] updateMyInfo : {}", updateMemberDTO);
+
+    memberService.updateMyInfo(updateMemberDTO);
+
+    return BaseResponseFactory.success(MemberStatus.UPDATE_INFO_SUCCESS);
   }
 
   @DeleteMapping("/me")

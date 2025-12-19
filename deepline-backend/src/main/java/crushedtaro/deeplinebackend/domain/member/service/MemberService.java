@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import crushedtaro.deeplinebackend.domain.member.dto.FindIdDTO;
 import crushedtaro.deeplinebackend.domain.member.dto.MemberResponseDTO;
 import crushedtaro.deeplinebackend.domain.member.dto.ResetPasswordDTO;
+import crushedtaro.deeplinebackend.domain.member.dto.UpdateMemberDTO;
 import crushedtaro.deeplinebackend.domain.member.entity.Member;
 import crushedtaro.deeplinebackend.domain.member.repository.MemberRepository;
 
@@ -105,5 +106,27 @@ public class MemberService {
     member.withdraw();
 
     log.info("[MemberService] withdraw() END");
+  }
+
+  @Transactional
+  public void updateMyInfo(UpdateMemberDTO updateMemberDTO) {
+    log.info("[MemberService] updateMyInfo() START");
+
+    String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
+    Member member =
+        memberRepository
+            .findByMemberId(memberId)
+            .orElseThrow(() -> new RuntimeException("로그인 유저 정보를 찾을 수 없습니다."));
+
+    String newEmail = updateMemberDTO.memberEmail();
+    if (newEmail != null && !newEmail.equals(member.getMemberEmail())) {
+      if (memberRepository.existsByMemberEmail(newEmail)) {
+        throw new RuntimeException("이미 사용 중인 이메일입니다.");
+      }
+    }
+
+    member.updateMemberInfo(updateMemberDTO.memberName(), newEmail);
+
+    log.info("[MemberService] updateMyInfo() END");
   }
 }

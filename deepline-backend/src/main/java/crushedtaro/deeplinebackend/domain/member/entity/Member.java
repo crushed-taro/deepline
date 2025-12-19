@@ -54,4 +54,9 @@ public class Member {
     this.isDeleted = "Y";
     this.deletedAt = LocalDateTime.now();
   }
+
+  public void updateMemberInfo(String memberName, String memberEmail) {
+    this.memberName = memberName;
+    this.memberEmail = memberEmail;
+  }
 }
