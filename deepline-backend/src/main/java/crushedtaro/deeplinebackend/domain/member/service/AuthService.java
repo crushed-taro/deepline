@@ -40,8 +40,12 @@ public class AuthService {
     String encodedPassword = passwordEncoder.encode(member.memberPassword());
 
     Member registMember =
-        new Member(
-            0, member.memberId(), encodedPassword, member.memberName(), member.memberEmail(), null);
+        Member.builder()
+            .memberId(member.memberId())
+            .memberPassword(encodedPassword)
+            .memberName(member.memberName())
+            .memberEmail(member.memberEmail())
+            .build();
 
     Member savedMember = memberRepository.save(registMember);
 
@@ -70,6 +74,11 @@ public class AuthService {
     if (!memberRepository.existsByMemberId(member.memberId())) {
       log.warn("[AuthService] Login() Required User Not Found!");
       throw new RuntimeException("User Not Found");
+    }
+
+    if ("Y".equals(registedUser.getIsDeleted())) {
+      log.warn("[AuthService] Login() Deleted User Attempted Login!");
+      throw new RuntimeException("Deleted User Cannot Login");
     }
 
     if (!passwordEncoder.matches(member.memberPassword(), registedUser.getMemberPassword())) {

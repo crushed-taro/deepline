@@ -1,5 +1,6 @@
 package crushedtaro.deeplinebackend.domain.member.entity;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.persistence.*;
@@ -34,11 +35,23 @@ public class Member {
   @Column(name = "member_email")
   private String memberEmail;
 
+  @Column(name = "is_deleted", nullable = false)
+  @Builder.Default
+  private String isDeleted = "N";
+
+  @Column(name = "deleted_at")
+  private LocalDateTime deletedAt;
+
   @OneToMany
   @JoinColumn(name = "member_code")
   private List<MemberRole> memberRole;
 
   public void changePassword(String newPassword) {
     this.memberPassword = newPassword;
+  }
+
+  public void withdraw() {
+    this.isDeleted = "Y";
+    this.deletedAt = LocalDateTime.now();
   }
 }

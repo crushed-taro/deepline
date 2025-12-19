@@ -88,4 +88,22 @@ public class MemberService {
         member.getMemberName(),
         member.getMemberEmail());
   }
+
+  @Transactional
+  public void withdraw() {
+    log.info("[MemberService] withdraw() START");
+
+    String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+    log.info("[MemberService] Current User ID : {}", memberId);
+
+    Member member =
+        memberRepository
+            .findByMemberId(memberId)
+            .orElseThrow(() -> new RuntimeException("로그인 유저 정보를 찾을 수 없습니다."));
+
+    member.withdraw();
+
+    log.info("[MemberService] withdraw() END");
+  }
 }

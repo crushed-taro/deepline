@@ -39,6 +39,10 @@ public class CustomUserDetailsService implements UserDetailsService {
             .findByMemberId(username)
             .orElseThrow(() -> new RuntimeException("로그인 유저 정보를 찾을 수 없습니다."));
 
+    if ("Y".equals(memberEntity.getIsDeleted())) {
+      throw new UsernameNotFoundException("탈퇴한 회원입니다.");
+    }
+
     List<GrantedAuthority> authorities = new ArrayList<>();
     for (MemberRole role : memberEntity.getMemberRole()) {
       String authorityName = role.getAuthority().getAuthorityName();

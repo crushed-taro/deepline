@@ -61,6 +61,11 @@ public class MemberController {
 
   @DeleteMapping("/me")
   public ResponseEntity<BaseResponse<Void>> withdraw() {
-    return null;
+
+    log.info("[MemberController] withdraw");
+
+    memberService.withdraw();
+
+    return BaseResponseFactory.success(MemberStatus.WITHDRAW_SUCCESS);
   }
 }
