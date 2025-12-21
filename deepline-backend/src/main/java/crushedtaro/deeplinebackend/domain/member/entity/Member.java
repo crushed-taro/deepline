@@ -10,6 +10,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import crushedtaro.deeplinebackend.domain.organization.entity.Department;
+import crushedtaro.deeplinebackend.domain.organization.entity.Position;
+
 @Entity
 @Table(name = "tbl_member")
 @Getter
@@ -45,6 +48,14 @@ public class Member {
   @OneToMany
   @JoinColumn(name = "member_code")
   private List<MemberRole> memberRole;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "dept_code")
+  private Department department;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "position_code")
+  private Position position;
 
   public void changePassword(String newPassword) {
     this.memberPassword = newPassword;
