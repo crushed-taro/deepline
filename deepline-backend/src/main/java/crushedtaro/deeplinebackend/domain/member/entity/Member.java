@@ -70,4 +70,12 @@ public class Member {
     this.memberName = memberName;
     this.memberEmail = memberEmail;
   }
+
+  public void assignDepartment(Department department) {
+    this.department = department;
+  }
+
+  public void assignPosition(Position position) {
+    this.position = position;
+  }
 }

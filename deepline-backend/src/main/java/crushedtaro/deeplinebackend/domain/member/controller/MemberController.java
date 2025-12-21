@@ -71,4 +71,15 @@ public class MemberController {
 
     return BaseResponseFactory.success(MemberStatus.WITHDRAW_SUCCESS);
   }
+
+  @PutMapping("/{memberId}/assign")
+  public ResponseEntity<BaseResponse<Void>> assignMember(
+      @PathVariable String memberId, @RequestBody MemberAssignmentDTO assignmentDTO) {
+
+    log.info("[MemberController] assignMember : Target={}, DTO={}", memberId, assignmentDTO);
+
+    memberService.assignMember(memberId, assignmentDTO);
+
+    return BaseResponseFactory.success(MemberStatus.ASSIGN_SUCCESS);
+  }
 }

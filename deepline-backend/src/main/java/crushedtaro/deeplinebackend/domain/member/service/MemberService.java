@@ -9,12 +9,13 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import crushedtaro.deeplinebackend.domain.member.dto.FindIdDTO;
-import crushedtaro.deeplinebackend.domain.member.dto.MemberResponseDTO;
-import crushedtaro.deeplinebackend.domain.member.dto.ResetPasswordDTO;
-import crushedtaro.deeplinebackend.domain.member.dto.UpdateMemberDTO;
+import crushedtaro.deeplinebackend.domain.member.dto.*;
 import crushedtaro.deeplinebackend.domain.member.entity.Member;
 import crushedtaro.deeplinebackend.domain.member.repository.MemberRepository;
+import crushedtaro.deeplinebackend.domain.organization.entity.Department;
+import crushedtaro.deeplinebackend.domain.organization.entity.Position;
+import crushedtaro.deeplinebackend.domain.organization.repository.DepartmentRepository;
+import crushedtaro.deeplinebackend.domain.organization.repository.PositionRepository;
 
 @Service
 @Slf4j
@@ -23,6 +24,9 @@ public class MemberService {
 
   private final MemberRepository memberRepository;
   private final PasswordEncoder passwordEncoder;
+
+  private final DepartmentRepository departmentRepository;
+  private final PositionRepository positionRepository;
 
   @Transactional(readOnly = true)
   public String findMemberId(FindIdDTO findIdDTO) {
@@ -81,13 +85,21 @@ public class MemberService {
             .findByMemberId(memberId)
             .orElseThrow(() -> new RuntimeException("로그인 유저 정보를 찾을 수 없습니다."));
 
+    String deptName =
+        (member.getDepartment() != null) ? member.getDepartment().getDeptName() : "소속 없음";
+
+    String positionName =
+        (member.getPosition() != null) ? member.getPosition().getPositionName() : "직급 없음";
+
     log.info("[MemberService] getMyInfo() END");
 
     return new MemberResponseDTO(
         member.getMemberCode(),
         member.getMemberId(),
         member.getMemberName(),
-        member.getMemberEmail());
+        member.getMemberEmail(),
+        deptName,
+        positionName);
   }
 
   @Transactional
@@ -128,5 +140,30 @@ public class MemberService {
     member.updateMemberInfo(updateMemberDTO.memberName(), newEmail);
 
     log.info("[MemberService] updateMyInfo() END");
+  }
+
+  @Transactional
+  public void assignMember(String memberId, MemberAssignmentDTO memberAssignmentDTO) {
+    log.info("[MemberService] assignMember() START");
+
+    Member member =
+        memberRepository
+            .findByMemberId(memberId)
+            .orElseThrow(() -> new RuntimeException("해당 회원을 찾을 수 없습니다."));
+
+    Department department =
+        departmentRepository
+            .findById(memberAssignmentDTO.deptCode())
+            .orElseThrow(() -> new RuntimeException("존재하지 않는 부서입니다."));
+
+    Position position =
+        positionRepository
+            .findById(memberAssignmentDTO.positionCode())
+            .orElseThrow(() -> new RuntimeException("존재하지 않는 직급입니다."));
+
+    member.assignDepartment(department);
+    member.assignPosition(position);
+
+    log.info("[MemberService] assignMember() END");
   }
 }
