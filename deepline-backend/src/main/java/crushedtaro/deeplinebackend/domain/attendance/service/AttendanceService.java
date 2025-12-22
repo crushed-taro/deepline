@@ -3,6 +3,10 @@ package crushedtaro.deeplinebackend.domain.attendance.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -11,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import crushedtaro.deeplinebackend.domain.attendance.dto.AttendanceResponseDTO;
 import crushedtaro.deeplinebackend.domain.attendance.entity.Attendance;
 import crushedtaro.deeplinebackend.domain.attendance.enums.AttendanceStatus;
 import crushedtaro.deeplinebackend.domain.attendance.repository.AttendanceRepository;
@@ -27,6 +32,7 @@ public class AttendanceService {
 
   @Transactional
   public void clockIn() {
+    log.info("[AttendanceService] ClockIn Start");
     String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
 
     Member member =
@@ -57,6 +63,7 @@ public class AttendanceService {
 
   @Transactional
   public void clockOut() {
+    log.info("[AttendanceService] ClockOut Start");
     String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
 
     Member member =
@@ -74,5 +81,41 @@ public class AttendanceService {
     attendance.clockOut(LocalDateTime.now());
 
     log.info("[Attendance] Clock-out End");
+  }
+
+  @Transactional(readOnly = true)
+  public List<AttendanceResponseDTO> getMyAttendance(int year, int month) {
+    log.info("[AttendanceService] getMyAttendance Start");
+
+    String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+    Member member =
+        memberRepository
+            .findByMemberId(memberId)
+            .orElseThrow(() -> new RuntimeException("회원 정보가 없습니다."));
+
+    YearMonth yearMonth = YearMonth.of(year, month);
+    LocalDate startDate = yearMonth.atDay(1);
+    LocalDate endDate = yearMonth.atEndOfMonth();
+
+    List<Attendance> attendanceList =
+        attendanceRepository.findAllByMemberAndWorkDateBetweenOrderByWorkDateAsc(
+            member, startDate, endDate);
+
+    DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+    return attendanceList.stream()
+        .map(
+            attendance ->
+                new AttendanceResponseDTO(
+                    attendance.getWorkDate(),
+                    (attendance.getStartTime() != null)
+                        ? attendance.getStartTime().format(timeFormatter)
+                        : null,
+                    (attendance.getEndTime() != null)
+                        ? attendance.getEndTime().format(timeFormatter)
+                        : null,
+                    attendance.getStatus()))
+        .collect(Collectors.toList());
   }
 }

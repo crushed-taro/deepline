@@ -1,6 +1,7 @@
 package crushedtaro.deeplinebackend.domain.attendance.repository;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,4 +14,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
   Optional<Attendance> findByMemberAndWorkDate(Member member, LocalDate workDate);
 
   boolean existsByMemberAndWorkDate(Member member, LocalDate workDate);
+
+  List<Attendance> findAllByMemberAndWorkDateBetweenOrderByWorkDateAsc(
+      Member member, LocalDate startDate, LocalDate endDate);
 }

@@ -1,13 +1,15 @@
 package crushedtaro.deeplinebackend.domain.attendance.controller;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import crushedtaro.deeplinebackend.domain.attendance.dto.AttendanceResponseDTO;
 import crushedtaro.deeplinebackend.domain.attendance.enums.AttendanceResponseStatus;
 import crushedtaro.deeplinebackend.domain.attendance.service.AttendanceService;
 import crushedtaro.deeplinebackend.domain.common.BaseResponse;
@@ -33,5 +35,19 @@ public class AttendanceController {
     log.info("[AttendanceController] clockOut Start");
     attendanceService.clockOut();
     return BaseResponseFactory.success(AttendanceResponseStatus.CLOCK_OUT_SUCCESS);
+  }
+
+  @GetMapping("/me")
+  public ResponseEntity<BaseResponse<List<AttendanceResponseDTO>>> getMyAttendance(
+      @RequestParam(required = false) Integer year, @RequestParam(required = false) Integer month) {
+
+    LocalDate now = LocalDate.now();
+
+    year = (year != null) ? year : now.getYear();
+    month = (month != null) ? month : now.getMonthValue();
+
+    List<AttendanceResponseDTO> result = attendanceService.getMyAttendance(year, month);
+
+    return BaseResponseFactory.success(AttendanceResponseStatus.READ_PROFILE_SUCCESS, result);
   }
 }
