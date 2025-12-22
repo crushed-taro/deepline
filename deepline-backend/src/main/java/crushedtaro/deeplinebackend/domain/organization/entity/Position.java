@@ -1,5 +1,6 @@
 package crushedtaro.deeplinebackend.domain.organization.entity;
 
+import crushedtaro.deeplinebackend.domain.common.BaseEntity;
 import jakarta.persistence.*;
 
 import lombok.AllArgsConstructor;
@@ -13,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Position {
+public class Position extends BaseEntity {
 
   @Id
   @Column(name = "position_code")

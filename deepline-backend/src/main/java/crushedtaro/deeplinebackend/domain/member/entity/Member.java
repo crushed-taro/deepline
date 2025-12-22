@@ -3,6 +3,7 @@ package crushedtaro.deeplinebackend.domain.member.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import crushedtaro.deeplinebackend.domain.common.BaseEntity;
 import jakarta.persistence.*;
 
 import lombok.AllArgsConstructor;
@@ -19,7 +20,7 @@ import crushedtaro.deeplinebackend.domain.organization.entity.Position;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Member {
+public class Member extends BaseEntity {
 
   @Id
   @Column(name = "member_code")

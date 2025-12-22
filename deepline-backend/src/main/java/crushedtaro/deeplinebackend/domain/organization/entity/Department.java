@@ -1,5 +1,6 @@
 package crushedtaro.deeplinebackend.domain.organization.entity;
 
+import crushedtaro.deeplinebackend.domain.common.BaseEntity;
 import jakarta.persistence.*;
 
 import lombok.AllArgsConstructor;
@@ -13,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Department {
+public class Department extends BaseEntity {
 
   @Id
   @Column(name = "dept_code")
