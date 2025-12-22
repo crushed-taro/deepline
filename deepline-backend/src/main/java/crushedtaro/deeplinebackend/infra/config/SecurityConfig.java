@@ -43,7 +43,7 @@ public class SecurityConfig {
               auth.requestMatchers(HttpMethod.PUT, "/api/v1/members/*/assign").hasRole("HR");
 
               auth.requestMatchers("/api/v1/members/**").permitAll();
-              auth.requestMatchers("/api/**").hasAnyRole("USER", "ADMIN");
+              auth.requestMatchers("/api/**").hasAnyRole("USER", "ADMIN", "HR");
               auth.anyRequest().permitAll();
             })
         .sessionManagement(
