@@ -1,5 +1,9 @@
 package crushedtaro.deeplinebackend.domain.member.controller;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -81,5 +85,16 @@ public class MemberController {
     memberService.assignMember(memberId, assignmentDTO);
 
     return BaseResponseFactory.success(MemberStatus.ASSIGN_SUCCESS);
+  }
+
+  @GetMapping
+  public ResponseEntity<BaseResponse<Page<MemberResponseDTO>>> getMemberList(
+      @PageableDefault(size = 10, sort = "memberCode", direction = Sort.Direction.DESC)
+          Pageable pageable,
+      @RequestParam(required = false) String searchName) {
+    log.info("[MemberController] getMemberList: searchName={}", searchName);
+    Page<MemberResponseDTO> memberList = memberService.getMemberList(pageable, searchName);
+
+    return BaseResponseFactory.success(MemberStatus.READ_LIST_SUCCESS, memberList);
   }
 }

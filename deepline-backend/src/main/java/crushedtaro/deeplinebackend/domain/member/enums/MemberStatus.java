@@ -15,7 +15,8 @@ public enum MemberStatus implements ResponseStatus {
   READ_PROFILE_SUCCESS(HttpStatus.OK, "MEMBER_003", "내 정보 조회 성공"),
   WITHDRAW_SUCCESS(HttpStatus.OK, "MEMBER_004", "회원 탈퇴 성공"),
   UPDATE_INFO_SUCCESS(HttpStatus.OK, "MEMBER_005", "회원 정보 수정 성공"),
-  ASSIGN_SUCCESS(HttpStatus.OK, "MEMBER_006", "회원 권한 수정 성공");
+  ASSIGN_SUCCESS(HttpStatus.OK, "MEMBER_006", "회원 권한 수정 성공"),
+  READ_LIST_SUCCESS(HttpStatus.OK, "MEMBER_007", "회원 목록 조회 성공");
 
   private final HttpStatus status;
   private final String code;

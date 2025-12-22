@@ -1,5 +1,7 @@
 package crushedtaro.deeplinebackend.domain.member.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -165,5 +167,39 @@ public class MemberService {
     member.assignPosition(position);
 
     log.info("[MemberService] assignMember() END");
+  }
+
+  @Transactional(readOnly = true)
+  public Page<MemberResponseDTO> getMemberList(Pageable pageable, String searchName) {
+    log.info("[MemberService] getMemberList() START");
+
+    Page<Member> memberPage;
+
+    if (searchName != null && !searchName.isEmpty()) {
+      memberPage = memberRepository.findByMemberNameContaining(searchName, pageable);
+    } else {
+      memberPage = memberRepository.findAll(pageable);
+    }
+
+    Page<MemberResponseDTO> memberResponseDTOPage =
+        memberPage.map(
+            member -> {
+              String deptName =
+                  (member.getDepartment() != null) ? member.getDepartment().getDeptName() : "미배정";
+              String positionName =
+                  (member.getPosition() != null) ? member.getPosition().getPositionName() : "미배정";
+
+              return new MemberResponseDTO(
+                  member.getMemberCode(),
+                  member.getMemberId(),
+                  member.getMemberName(),
+                  member.getMemberEmail(),
+                  deptName,
+                  positionName);
+            });
+
+    log.info("[MemberService] getMemberList() END");
+
+    return memberResponseDTOPage;
   }
 }
