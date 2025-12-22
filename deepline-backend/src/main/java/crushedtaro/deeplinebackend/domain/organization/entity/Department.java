@@ -1,12 +1,13 @@
 package crushedtaro.deeplinebackend.domain.organization.entity;
 
-import crushedtaro.deeplinebackend.domain.common.BaseEntity;
 import jakarta.persistence.*;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import crushedtaro.deeplinebackend.domain.common.BaseEntity;
 
 @Entity
 @Table(name = "tbl_department")

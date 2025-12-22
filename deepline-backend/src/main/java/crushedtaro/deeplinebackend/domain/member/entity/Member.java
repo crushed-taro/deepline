@@ -3,7 +3,6 @@ package crushedtaro.deeplinebackend.domain.member.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import crushedtaro.deeplinebackend.domain.common.BaseEntity;
 import jakarta.persistence.*;
 
 import lombok.AllArgsConstructor;
@@ -11,6 +10,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import crushedtaro.deeplinebackend.domain.common.BaseEntity;
 import crushedtaro.deeplinebackend.domain.organization.entity.Department;
 import crushedtaro.deeplinebackend.domain.organization.entity.Position;
 
