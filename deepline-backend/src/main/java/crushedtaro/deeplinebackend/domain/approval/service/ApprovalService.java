@@ -10,10 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import crushedtaro.deeplinebackend.domain.approval.dto.ApprovalDetailDTO;
-import crushedtaro.deeplinebackend.domain.approval.dto.ApprovalLineDTO;
-import crushedtaro.deeplinebackend.domain.approval.dto.ApprovalListDTO;
-import crushedtaro.deeplinebackend.domain.approval.dto.ApprovalRegistDTO;
+import crushedtaro.deeplinebackend.domain.approval.dto.*;
 import crushedtaro.deeplinebackend.domain.approval.entity.Approval;
 import crushedtaro.deeplinebackend.domain.approval.entity.ApprovalLine;
 import crushedtaro.deeplinebackend.domain.approval.enums.ApprovalStatus;
@@ -168,5 +165,55 @@ public class ApprovalService {
         approval.getStatus(),
         approval.getCreatedAt(),
         approvalLineDTOS);
+  }
+
+  @Transactional
+  public void processApproval(Long approvalCode, ApprovalProcessDTO approvalProcessDTO) {
+    log.info("[ApprovalService] processApproval Start");
+
+    String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
+    Member approver =
+        memberRepository
+            .findByMemberId(memberId)
+            .orElseThrow(() -> new RuntimeException("회원 정보가 없습니다."));
+
+    Approval approval =
+        approvalRepository
+            .findById(approvalCode)
+            .orElseThrow(() -> new RuntimeException("존재하지 않는 결재 문서입니다."));
+
+    ApprovalLine myLine =
+        approval.getApprovalLines().stream()
+            .filter(line -> line.getApprover().getMemberCode() == approver.getMemberCode())
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("결재 권한이 없습니다."));
+
+    if (myLine.getStatus() != ApprovalStatus.PENDING) {
+      throw new RuntimeException("현재 결재할 수 있는 상태가 아닙니다.");
+    }
+
+    myLine.processApproval(approvalProcessDTO.status(), approvalProcessDTO.comments());
+
+    if (approvalProcessDTO.status() == ApprovalStatus.REJECTED) {
+      approval.changeStatus(ApprovalStatus.REJECTED);
+      log.info("[ApprovalService] 결재 문서가 반려되었습니다.");
+    } else if (approvalProcessDTO.status() == ApprovalStatus.APPROVED) {
+      int netxtOrder = myLine.getLineOrder() + 1;
+
+      ApprovalLine nextLine =
+          approval.getApprovalLines().stream()
+              .filter(line -> line.getLineOrder() == netxtOrder)
+              .findFirst()
+              .orElse(null);
+
+      if (nextLine != null) {
+        nextLine.processApproval(ApprovalStatus.PENDING, null);
+        log.info("[ApprovalService] 다음 결재자로 넘어갔습니다.");
+      } else {
+        approval.changeStatus(ApprovalStatus.APPROVED);
+        log.info("[ApprovalService] 최종 승인이 완료되었습니다.");
+      }
+    }
+    log.info("[ApprovalService] processApproval End");
   }
 }

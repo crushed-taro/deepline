@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import crushedtaro.deeplinebackend.domain.approval.dto.ApprovalDetailDTO;
 import crushedtaro.deeplinebackend.domain.approval.dto.ApprovalListDTO;
+import crushedtaro.deeplinebackend.domain.approval.dto.ApprovalProcessDTO;
 import crushedtaro.deeplinebackend.domain.approval.dto.ApprovalRegistDTO;
 import crushedtaro.deeplinebackend.domain.approval.enums.ApprovalResponseStatus;
 import crushedtaro.deeplinebackend.domain.approval.service.ApprovalService;
@@ -58,5 +59,15 @@ public class ApprovalController {
     ApprovalDetailDTO approvalDetailDTO = approvalService.getApprovalDetail(approvalCode);
     return BaseResponseFactory.success(
         ApprovalResponseStatus.READ_PROFILE_SUCCESS, approvalDetailDTO);
+  }
+
+  @PostMapping("/{approvalCode}/process")
+  public ResponseEntity<BaseResponse<Void>> processApproval(
+      @PathVariable Long approvalCode, @RequestBody ApprovalProcessDTO approvalProcessDTO) {
+    log.info("[ApprovalController] processApproval Start");
+
+    approvalService.processApproval(approvalCode, approvalProcessDTO);
+
+    return BaseResponseFactory.success(ApprovalResponseStatus.APPROVAL_PROCESS_SUCCESS);
   }
 }
