@@ -1,6 +1,7 @@
 package crushedtaro.deeplinebackend.domain.approval.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import crushedtaro.deeplinebackend.domain.approval.dto.ApprovalListDTO;
 import crushedtaro.deeplinebackend.domain.approval.dto.ApprovalRegistDTO;
 import crushedtaro.deeplinebackend.domain.approval.entity.Approval;
 import crushedtaro.deeplinebackend.domain.approval.entity.ApprovalLine;
@@ -79,5 +81,28 @@ public class ApprovalService {
     approvalRepository.save(approval);
 
     log.info("[ApprovalService] registerApproval End");
+  }
+
+  @Transactional(readOnly = true)
+  public List<ApprovalListDTO> getSentApprovals() {
+
+    log.info("[ApprovalService] getSentApprovals Start");
+    String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+    Member member =
+        memberRepository
+            .findByMemberId(memberId)
+            .orElseThrow(() -> new RuntimeException("회원 정보가 없습니다."));
+
+    return approvalRepository.findAllByMemberOrderByCreatedAtDesc(member).stream()
+        .map(
+            a ->
+                new ApprovalListDTO(
+                    a.getApprovalCode(),
+                    a.getTitle(),
+                    a.getMember().getMemberName(),
+                    a.getStatus(),
+                    a.getCreatedAt()))
+        .collect(Collectors.toList());
   }
 }

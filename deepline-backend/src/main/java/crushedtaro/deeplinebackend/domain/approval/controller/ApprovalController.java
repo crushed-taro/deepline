@@ -1,14 +1,14 @@
 package crushedtaro.deeplinebackend.domain.approval.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import crushedtaro.deeplinebackend.domain.approval.dto.ApprovalListDTO;
 import crushedtaro.deeplinebackend.domain.approval.dto.ApprovalRegistDTO;
 import crushedtaro.deeplinebackend.domain.approval.enums.ApprovalResponseStatus;
 import crushedtaro.deeplinebackend.domain.approval.service.ApprovalService;
@@ -32,5 +32,11 @@ public class ApprovalController {
     approvalService.registerApproval(approvalRegistDTO);
 
     return BaseResponseFactory.success(ApprovalResponseStatus.APPROVAL_REGIST_SUCCESS);
+  }
+
+  @GetMapping("/sent")
+  public ResponseEntity<BaseResponse<List<ApprovalListDTO>>> getSentApprovals() {
+    List<ApprovalListDTO> approvalList = approvalService.getSentApprovals();
+    return BaseResponseFactory.success(ApprovalResponseStatus.READ_PROFILE_SUCCESS, approvalList);
   }
 }
