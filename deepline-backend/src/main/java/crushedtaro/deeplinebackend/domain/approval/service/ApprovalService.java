@@ -1,0 +1,83 @@
+package crushedtaro.deeplinebackend.domain.approval.service;
+
+import java.util.List;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import crushedtaro.deeplinebackend.domain.approval.dto.ApprovalRegistDTO;
+import crushedtaro.deeplinebackend.domain.approval.entity.Approval;
+import crushedtaro.deeplinebackend.domain.approval.entity.ApprovalLine;
+import crushedtaro.deeplinebackend.domain.approval.enums.ApprovalStatus;
+import crushedtaro.deeplinebackend.domain.approval.repository.ApprovalRepository;
+import crushedtaro.deeplinebackend.domain.member.entity.Member;
+import crushedtaro.deeplinebackend.domain.member.repository.MemberRepository;
+
+@Service
+@Slf4j
+@RequiredArgsConstructor
+public class ApprovalService {
+
+  private final ApprovalRepository approvalRepository;
+  private final MemberRepository memberRepository;
+
+  @Transactional
+  public void registerApproval(ApprovalRegistDTO approvalRegistDTO) {
+    log.info("[ApprovalService] registerApproval Start");
+
+    String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+    Member member =
+        memberRepository
+            .findByMemberId(memberId)
+            .orElseThrow(() -> new RuntimeException("회원 정보가 없습니다."));
+
+    Approval approval =
+        Approval.builder()
+            .title(approvalRegistDTO.title())
+            .content(approvalRegistDTO.content())
+            .member(member)
+            .status(ApprovalStatus.PENDING)
+            .build();
+
+    List<Integer> approverCodes = approvalRegistDTO.approverCodes();
+
+    if (approverCodes == null || approverCodes.isEmpty()) {
+      throw new RuntimeException("최소 1명 이상의 결재자를 지정해야 합니다.");
+    }
+
+    for (int i = 0; i < approverCodes.size(); i++) {
+
+      int approverCode = approverCodes.get(i);
+
+      Member approver =
+          memberRepository
+              .findById(approverCode)
+              .orElseThrow(() -> new RuntimeException("결재자 정보가 없습니다."));
+
+      if (approver.getMemberCode() == member.getMemberCode()) {
+        throw new RuntimeException("본인은 결재자로 지정할 수 없습니다.");
+      }
+
+      ApprovalStatus lineStatus = (i == 0) ? ApprovalStatus.PENDING : ApprovalStatus.WAITING;
+
+      ApprovalLine approvalLine =
+          ApprovalLine.builder()
+              .approval(approval)
+              .approver(approver)
+              .status(lineStatus)
+              .lineOrder(i + 1)
+              .build();
+
+      approval.getApprovalLine().add(approvalLine);
+    }
+
+    approvalRepository.save(approval);
+
+    log.info("[ApprovalService] registerApproval End");
+  }
+}
