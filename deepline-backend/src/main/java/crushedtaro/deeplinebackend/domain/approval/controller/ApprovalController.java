@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import crushedtaro.deeplinebackend.domain.approval.dto.ApprovalDetailDTO;
 import crushedtaro.deeplinebackend.domain.approval.dto.ApprovalListDTO;
 import crushedtaro.deeplinebackend.domain.approval.dto.ApprovalRegistDTO;
 import crushedtaro.deeplinebackend.domain.approval.enums.ApprovalResponseStatus;
@@ -47,5 +48,15 @@ public class ApprovalController {
 
     List<ApprovalListDTO> approvalList = approvalService.getReceivedApprovals();
     return BaseResponseFactory.success(ApprovalResponseStatus.READ_PROFILE_SUCCESS, approvalList);
+  }
+
+  @GetMapping("/{approvalCode}")
+  public ResponseEntity<BaseResponse<ApprovalDetailDTO>> getApprovalDetail(
+      @PathVariable Long approvalCode) {
+    log.info("[ApprovalController] getApprovalDetail Start");
+
+    ApprovalDetailDTO approvalDetailDTO = approvalService.getApprovalDetail(approvalCode);
+    return BaseResponseFactory.success(
+        ApprovalResponseStatus.READ_PROFILE_SUCCESS, approvalDetailDTO);
   }
 }

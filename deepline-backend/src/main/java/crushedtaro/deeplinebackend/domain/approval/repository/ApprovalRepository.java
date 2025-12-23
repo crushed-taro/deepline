@@ -14,7 +14,7 @@ public interface ApprovalRepository extends JpaRepository<Approval, Long> {
 
   @Query(
       "select approval from Approval approval "
-          + "join approval.approvalLine approvalLine "
+          + "join approval.approvalLines approvalLine "
           + "join approvalLine.approver member "
           + "where member.memberCode = :memberCode "
           + "and approvalLine.status = 'PENDING' "

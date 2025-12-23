@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import crushedtaro.deeplinebackend.domain.approval.dto.ApprovalDetailDTO;
+import crushedtaro.deeplinebackend.domain.approval.dto.ApprovalLineDTO;
 import crushedtaro.deeplinebackend.domain.approval.dto.ApprovalListDTO;
 import crushedtaro.deeplinebackend.domain.approval.dto.ApprovalRegistDTO;
 import crushedtaro.deeplinebackend.domain.approval.entity.Approval;
@@ -75,7 +77,7 @@ public class ApprovalService {
               .lineOrder(i + 1)
               .build();
 
-      approval.getApprovalLine().add(approvalLine);
+      approval.getApprovalLines().add(approvalLine);
     }
 
     approvalRepository.save(approval);
@@ -126,5 +128,45 @@ public class ApprovalService {
                     a.getStatus(),
                     a.getCreatedAt()))
         .collect(Collectors.toList());
+  }
+
+  @Transactional(readOnly = true)
+  public ApprovalDetailDTO getApprovalDetail(Long approvalCode) {
+    log.info("[ApprovalService] getApprovalDetail Start");
+
+    Approval approval =
+        approvalRepository
+            .findById(approvalCode)
+            .orElseThrow(() -> new RuntimeException("해당 결재 문서가 존재하지 않습니다."));
+
+    List<ApprovalLineDTO> approvalLineDTOS =
+        approval.getApprovalLines().stream()
+            .map(
+                line ->
+                    new ApprovalLineDTO(
+                        line.getLineOrder(),
+                        line.getApprover().getMemberName(),
+                        (line.getApprover().getPosition() != null)
+                            ? line.getApprover().getPosition().getPositionName()
+                            : "",
+                        line.getStatus(),
+                        line.getComment(),
+                        line.getProcessedAt()))
+            .toList();
+
+    String deptName =
+        (approval.getMember().getDepartment() != null)
+            ? approval.getMember().getDepartment().getDeptName()
+            : "";
+
+    return new ApprovalDetailDTO(
+        approval.getApprovalCode(),
+        approval.getTitle(),
+        approval.getContent(),
+        approval.getMember().getMemberName(),
+        deptName,
+        approval.getStatus(),
+        approval.getCreatedAt(),
+        approvalLineDTOS);
   }
 }

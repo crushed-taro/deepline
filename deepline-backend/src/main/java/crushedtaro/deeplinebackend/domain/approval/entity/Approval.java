@@ -48,7 +48,7 @@ public class Approval extends BaseEntity {
 
   @OneToMany(mappedBy = "approval", cascade = CascadeType.ALL)
   @Builder.Default
-  private List<ApprovalLine> approvalLine = new ArrayList<>();
+  private List<ApprovalLine> approvalLines = new ArrayList<>();
 
   public void changeStatus(ApprovalStatus status) {
     this.status = status;
