@@ -105,4 +105,26 @@ public class ApprovalService {
                     a.getCreatedAt()))
         .collect(Collectors.toList());
   }
+
+  @Transactional(readOnly = true)
+  public List<ApprovalListDTO> getReceivedApprovals() {
+    log.info("[ApprovalService] getReceivedApprovals Start");
+    String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+    Member member =
+        memberRepository
+            .findByMemberId(memberId)
+            .orElseThrow(() -> new RuntimeException("회원 정보가 없습니다."));
+
+    return approvalRepository.findWaitApprovals(member.getMemberCode()).stream()
+        .map(
+            a ->
+                new ApprovalListDTO(
+                    a.getApprovalCode(),
+                    a.getTitle(),
+                    a.getMember().getMemberName(),
+                    a.getStatus(),
+                    a.getCreatedAt()))
+        .collect(Collectors.toList());
+  }
 }

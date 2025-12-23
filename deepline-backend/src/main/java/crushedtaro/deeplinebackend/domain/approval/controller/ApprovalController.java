@@ -36,7 +36,16 @@ public class ApprovalController {
 
   @GetMapping("/sent")
   public ResponseEntity<BaseResponse<List<ApprovalListDTO>>> getSentApprovals() {
+    log.info("[ApprovalController] getSentApproval Start");
     List<ApprovalListDTO> approvalList = approvalService.getSentApprovals();
+    return BaseResponseFactory.success(ApprovalResponseStatus.READ_PROFILE_SUCCESS, approvalList);
+  }
+
+  @GetMapping("/received")
+  public ResponseEntity<BaseResponse<List<ApprovalListDTO>>> getReceivedApprovals() {
+    log.info("[ApprovalController] getReceivedApproval Start");
+
+    List<ApprovalListDTO> approvalList = approvalService.getReceivedApprovals();
     return BaseResponseFactory.success(ApprovalResponseStatus.READ_PROFILE_SUCCESS, approvalList);
   }
 }
