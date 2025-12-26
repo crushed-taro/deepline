@@ -5,6 +5,13 @@ export interface LoginRequest {
   memberPassword: string;
 }
 
+export interface SignUpRequest {
+  memberId: string;
+  memberPassword: string;
+  memberName: string;
+  memberEmail: string;
+}
+
 export interface TokenResponse {
   grantType: string;
   memberName: string;
@@ -13,6 +20,16 @@ export interface TokenResponse {
   tokenStatus: string;
 }
 
+export interface SignUpResponse {
+  memberId: number;
+  signupStatus: string;
+  message: string;
+}
+
 export type LoginApiResponse = BaseResponse & {
   result: TokenResponse;
+};
+
+export type SignUpApiResponse = BaseResponse & {
+  result: SignUpResponse;
 };
