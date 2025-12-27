@@ -15,6 +15,10 @@ import crushedtaro.deeplinebackend.domain.member.entity.MemberRole;
 import crushedtaro.deeplinebackend.domain.member.enums.SignupStatus;
 import crushedtaro.deeplinebackend.domain.member.repository.MemberRepository;
 import crushedtaro.deeplinebackend.domain.member.repository.MemberRoleRepository;
+import crushedtaro.deeplinebackend.domain.organization.entity.Department;
+import crushedtaro.deeplinebackend.domain.organization.entity.Position;
+import crushedtaro.deeplinebackend.domain.organization.repository.DepartmentRepository;
+import crushedtaro.deeplinebackend.domain.organization.repository.PositionRepository;
 import crushedtaro.deeplinebackend.infra.jwt.TokenProvider;
 
 @Service
@@ -26,6 +30,8 @@ public class AuthService {
   private final PasswordEncoder passwordEncoder;
   private final MemberRoleRepository memberRoleRepository;
   private final TokenProvider tokenProvider;
+  private final DepartmentRepository departmentRepository;
+  private final PositionRepository positionRepository;
 
   @Transactional
   public SignupResponseDTO signup(MemberDTO member) {
@@ -39,12 +45,17 @@ public class AuthService {
 
     String encodedPassword = passwordEncoder.encode(member.memberPassword());
 
+    Department defaultDept = departmentRepository.findById(1).orElse(null);
+    Position defaultPos = positionRepository.findById(1).orElse(null);
+
     Member registMember =
         Member.builder()
             .memberId(member.memberId())
             .memberPassword(encodedPassword)
             .memberName(member.memberName())
             .memberEmail(member.memberEmail())
+            .department(defaultDept)
+            .position(defaultPos)
             .build();
 
     Member savedMember = memberRepository.save(registMember);
