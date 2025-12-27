@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLogin } from "@/hooks/auth/useAuth.ts";
 import {
   Card,
@@ -11,10 +11,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label.tsx";
 import { Button } from "@/components/ui/button.tsx";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 export default function Login() {
-  const [memberId, setMemberId] = useState("");
+  const location = useLocation() as { state?: { foundId?: string } };
+  const foundId = location.state?.foundId;
+
+  const [memberId, setMemberId] = useState(foundId ?? "");
   const [password, setPassword] = useState("");
 
   const { mutate: login, isPending } = useLogin();
@@ -62,7 +65,6 @@ export default function Login() {
               </Label>
               <Input
                 id="password"
-                name="password"
                 type="password"
                 autoComplete="current-password"
                 placeholder="비밀번호를 입력하세요"
@@ -76,10 +78,21 @@ export default function Login() {
             <Button type="submit" className="w-full" disabled={isPending}>
               {isPending ? "로그인 중..." : "로그인"}
             </Button>
-            <div className="text-center text-sm">
-              계정이 없으신가요?{" "}
+            <div className="text-center text-sm text-muted-foreground">
+              계정이 없으신가요? <span className="mx-2"></span>
               <Link to="/signup" className="text-primary font-medium hover:underline">
                 회원가입
+              </Link>
+            </div>
+            <div className="text-center text-sm text-muted-foreground">
+              계정을 잊으셨나요?
+              <span className="mx-2"></span>
+              <Link to="/find-id" className="text-primary font-medium hover:underline">
+                아이디 찾기
+              </Link>
+              <span className="mx-2">·</span>
+              <Link to="/reset-password" className="text-primary font-medium hover:underline">
+                비밀번호 찾기
               </Link>
             </div>
           </CardFooter>

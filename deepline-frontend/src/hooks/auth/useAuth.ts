@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
-import { AuthApi } from "@/api/member/AuthApi.ts";
 import { toast } from "sonner";
 import type { LoginRequest, SignUpRequest } from "@/types/auth/auth.types.ts";
+import { AuthApi } from "@/api/auth/AuthApi.ts";
 
 export function useLogin() {
   const navigate = useNavigate();
