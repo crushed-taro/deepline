@@ -19,7 +19,7 @@ export const createApiClient = (config: ApiConfig): AxiosInstance => {
 
   const instance = axios.create(axiosConfig);
 
-  instance.interceptors.response.use(
+  instance.interceptors.request.use(
     (config) => {
       const token = localStorage.getItem("accessToken");
 
@@ -42,7 +42,7 @@ export const createApiClient = (config: ApiConfig): AxiosInstance => {
         window.location.href = "/login";
       }
 
-      return Promise.resolve(error);
+      return Promise.reject(error);
     }
   );
 
