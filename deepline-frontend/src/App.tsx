@@ -1,40 +1,36 @@
-import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
-// import MainLayout from '@/layouts/MainLayout.tsx';
-// import Home from '@/pages/Home.tsx';
+import { createBrowserRouter, RouterProvider, Navigate, redirect } from "react-router-dom";
 import { Toaster } from "sonner";
 import Signup from "@/pages/auth/Signup.tsx";
 import Login from "@/pages/auth/Login.tsx";
 import FindId from "@/pages/member/FindId.tsx";
+import Home from "@/pages/Home.tsx";
 
-// const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
-//     const token = localStorage.getItem('accessToken');
-//     return token ? children : <Navigate to="/login" replace />;
-// };
+const requireAuthLoader = () => {
+  const token = localStorage.getItem("accessToken");
+  if (!token) throw redirect("/login");
+  return null;
+};
+
+const publicOnlyLoader = () => {
+  const token = localStorage.getItem("accessToken");
+  if (token) throw redirect("/home");
+  return null;
+};
 
 const router = createBrowserRouter([
   {
-    path: "/login",
-    element: <Login />,
+    loader: publicOnlyLoader,
+    children: [
+      { path: "/login", element: <Login /> },
+      { path: "/signup", element: <Signup /> },
+      { path: "/find-id", element: <FindId /> },
+    ],
   },
   {
-    path: "/signup",
-    element: <Signup />,
+    loader: requireAuthLoader,
+    children: [{ path: "/home", element: <Home /> }],
   },
-  {
-    path: "/find-id",
-    element: <FindId />,
-  },
-  // {
-  //     path: '/',
-  //     element: (
-  //         <PrivateRoute>
-  //             <MainLayout />
-  //         </PrivateRoute>
-  //     ),
-  //     children: [
-  //         { path: '/', element: <Home /> },
-  //     ],
-  // },
+  { path: "*", element: <Navigate to="/home" replace /> },
 ]);
 
 function App() {
