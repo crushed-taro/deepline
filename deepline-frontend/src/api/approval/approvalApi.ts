@@ -1,4 +1,5 @@
 import type {
+  ApprovalDetailApiResponse,
   ApprovalListApiResponse,
   ApprovalProcessRequest,
   ApprovalRegistRequest,
