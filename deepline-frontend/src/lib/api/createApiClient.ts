@@ -29,7 +29,7 @@ export const createApiClient = (config: ApiConfig): AxiosInstance => {
       return config;
     },
     (error) => {
-      return Promise.resolve(error);
+      return Promise.reject(error);
     }
   );
 
