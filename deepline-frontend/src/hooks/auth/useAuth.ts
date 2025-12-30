@@ -15,7 +15,7 @@ export function useLogin() {
         localStorage.setItem("memberName", response.result.memberName);
 
         toast.success(`${response.result.memberName}님 환영합니다.`);
-        navigate("/login");
+        navigate("/");
       } else {
         toast.error("로그인에 실패했습니다.");
       }
