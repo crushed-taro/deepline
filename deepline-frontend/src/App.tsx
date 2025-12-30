@@ -5,6 +5,7 @@ import Login from "@/pages/auth/Login.tsx";
 import FindId from "@/pages/member/FindId.tsx";
 import Home from "@/pages/Home.tsx";
 import MainLayout from "@/layouts/MainLayout.tsx";
+import ApprovalWrite from "@/pages/approval/ApprovalWrite.tsx";
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const token = localStorage.getItem("accessToken");
@@ -44,7 +45,7 @@ const router = createBrowserRouter([
       {
         path: "approvals",
         children: [
-          { path: "new", element: <div>결재 상신 페이지 (준비중)</div> },
+          { path: "new", element: <ApprovalWrite /> },
           { path: "sent", element: <div>기안함 페이지 (준비중)</div> },
           { path: "received", element: <div>결재함 페이지 (준비중)</div> },
         ],

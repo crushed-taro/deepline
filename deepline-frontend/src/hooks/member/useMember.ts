@@ -1,7 +1,11 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import type { FindIdRequest, ResetPasswordRequest } from "@/types/member/member.types.ts";
+import type {
+  FindIdRequest,
+  MemberAssignmentRequest,
+  ResetPasswordRequest,
+} from "@/types/member/member.types.ts";
 import type { BaseResponse } from "@/types/BaseResponse.ts";
 import { MemberApi } from "@/api/member/memerApi.ts";
 
@@ -46,6 +50,32 @@ export function useResetPassword() {
     onError: (error: never) => {
       console.error("FindId Failed : ", error);
       toast.error(`아이디 찾기에 실패했습니다.`);
+    },
+  });
+}
+
+export function useGetMemberList(page: number, size: number, searchName?: string) {
+  console.log(page, size, searchName);
+  return useQuery({
+    queryKey: ["members", page, size, searchName],
+    queryFn: () => MemberApi.getMemberList(page, size, searchName),
+    placeholderData: (previousData) => previousData,
+  });
+}
+
+export function useAssignMember() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ memberId, data }: { memberId: string; data: MemberAssignmentRequest }) =>
+      MemberApi.assignMember(memberId, data),
+    onSuccess: () => {
+      toast.success("인사 발령이 완료되었습니다.");
+      queryClient.invalidateQueries({ queryKey: ["members"] });
+    },
+    onError: (error) => {
+      console.error("Assign Member Failed:", error);
+      toast.error("인사 발령에 실패했습니다.");
     },
   });
 }

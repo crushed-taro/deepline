@@ -13,6 +13,11 @@ export interface ResetPasswordRequest {
   confirmPassword: string;
 }
 
+export interface MemberAssignmentRequest {
+  deptCode: number;
+  positionCode: number;
+}
+
 export interface UpdateMyInfoRequest {
   memberName: string;
   memberEmail: string;
@@ -32,15 +37,32 @@ export interface MemberResponse {
   positionName: string;
 }
 
+export interface SortInfo {
+  sorted: boolean;
+  unsorted: boolean;
+  empty: boolean;
+}
+
+export interface PageableInfo {
+  pageNumber: number;
+  pageSize: number;
+  sort: SortInfo;
+  offset: number;
+  paged: boolean;
+  unpaged: boolean;
+}
+
 export interface PageResponse<T> {
   content: T[];
+  pageable: PageableInfo;
   totalPages: number;
   totalElements: number;
   last: boolean;
-  first: boolean;
-  size: number;
-  number: number;
   numberOfElements: number;
+  size: number;
+  sort: SortInfo;
+  number: number;
+  first: boolean;
   empty: boolean;
 }
 
@@ -52,4 +74,6 @@ export type GetMyInfoApiResponse = BaseResponse & {
   result: MemberResponse;
 };
 
-export type GetMemberListApiResponse = BaseResponse<PageResponse<MemberResponse>>;
+export type GetMemberListApiResponse = BaseResponse & {
+  result: PageResponse<MemberResponse>;
+};
