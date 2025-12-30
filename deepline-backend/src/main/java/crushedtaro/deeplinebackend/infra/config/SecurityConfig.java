@@ -1,5 +1,7 @@
 package crushedtaro.deeplinebackend.infra.config;
 
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -8,6 +10,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import lombok.AllArgsConstructor;
 
@@ -27,6 +32,25 @@ public class SecurityConfig {
   private final TokenProvider tokenProvider;
 
   @Bean
+  public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration config = new CorsConfiguration();
+
+    config.setAllowedOrigins(List.of("http://localhost:5173"));
+
+    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
+    config.setAllowedHeaders(List.of("*"));
+
+    config.setExposedHeaders(List.of("Authorization"));
+
+    config.setAllowCredentials(true);
+
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", config);
+    return source;
+  }
+
+  @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http.csrf(csrf -> csrf.disable())
         .exceptionHandling(
@@ -42,7 +66,8 @@ public class SecurityConfig {
 
               auth.requestMatchers(HttpMethod.PUT, "/api/v1/members/*/assign").hasRole("HR");
 
-              auth.requestMatchers(HttpMethod.GET, "/api/v1/members").hasAnyRole("HR", "ADMIN");
+              auth.requestMatchers(HttpMethod.GET, "/api/v1/members")
+                  .hasAnyRole("HR", "ADMIN", "USER");
 
               auth.requestMatchers("/api/v1/members/**").permitAll();
               auth.requestMatchers("/api/**").hasAnyRole("USER", "ADMIN", "HR");
