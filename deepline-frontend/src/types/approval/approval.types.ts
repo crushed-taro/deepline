@@ -1,3 +1,5 @@
+import type { BaseResponse } from "@/types/BaseResponse.ts";
+
 export type ApprovalStatus = "WAITING" | "PENDING" | "APPROVED" | "REJECTED";
 
 export interface ApprovalRegistRequest {
