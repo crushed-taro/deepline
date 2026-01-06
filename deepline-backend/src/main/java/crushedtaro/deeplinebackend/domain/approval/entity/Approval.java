@@ -1,5 +1,6 @@
 package crushedtaro.deeplinebackend.domain.approval.entity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import crushedtaro.deeplinebackend.domain.approval.enums.ApprovalStatus;
+import crushedtaro.deeplinebackend.domain.approval.enums.ApprovalType;
 import crushedtaro.deeplinebackend.domain.common.BaseEntity;
 import crushedtaro.deeplinebackend.domain.member.entity.Member;
 
@@ -49,6 +51,17 @@ public class Approval extends BaseEntity {
   @OneToMany(mappedBy = "approval", cascade = CascadeType.ALL)
   @Builder.Default
   private List<ApprovalLine> approvalLines = new ArrayList<>();
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "approval_type", nullable = false)
+  @Builder.Default
+  private ApprovalType approvalType = ApprovalType.GENERAL;
+
+  @Column(name = "start_date")
+  private LocalDate startDate;
+
+  @Column(name = "end_date")
+  private LocalDate endDate;
 
   public void changeStatus(ApprovalStatus status) {
     this.status = status;

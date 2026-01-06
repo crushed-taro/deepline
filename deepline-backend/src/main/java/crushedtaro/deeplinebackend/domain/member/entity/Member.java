@@ -5,10 +5,7 @@ import java.util.List;
 
 import jakarta.persistence.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import crushedtaro.deeplinebackend.domain.common.BaseEntity;
 import crushedtaro.deeplinebackend.domain.organization.entity.Department;
@@ -57,6 +54,17 @@ public class Member extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "position_code")
   private Position position;
+
+  @Column(name = "remain_vacation")
+  @Builder.Default
+  private double remainVacation = 15.0;
+
+  public void useVacation(double days) {
+    if (this.remainVacation < days) {
+      throw new RuntimeException("잔여 휴가 일수가 부족합니다. (잔여: " + this.remainVacation + ")");
+    }
+    this.remainVacation -= days;
+  }
 
   public void changePassword(String newPassword) {
     this.memberPassword = newPassword;

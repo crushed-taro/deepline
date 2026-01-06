@@ -1,5 +1,6 @@
 package crushedtaro.deeplinebackend.domain.approval.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,6 +16,9 @@ import crushedtaro.deeplinebackend.domain.approval.entity.Approval;
 import crushedtaro.deeplinebackend.domain.approval.entity.ApprovalLine;
 import crushedtaro.deeplinebackend.domain.approval.enums.ApprovalStatus;
 import crushedtaro.deeplinebackend.domain.approval.repository.ApprovalRepository;
+import crushedtaro.deeplinebackend.domain.attendance.entity.Attendance;
+import crushedtaro.deeplinebackend.domain.attendance.enums.AttendanceStatus;
+import crushedtaro.deeplinebackend.domain.attendance.repository.AttendanceRepository;
 import crushedtaro.deeplinebackend.domain.member.entity.Member;
 import crushedtaro.deeplinebackend.domain.member.repository.MemberRepository;
 
@@ -25,6 +29,7 @@ public class ApprovalService {
 
   private final ApprovalRepository approvalRepository;
   private final MemberRepository memberRepository;
+  private final AttendanceRepository attendanceRepository;
 
   @Transactional
   public void registerApproval(ApprovalRegistDTO approvalRegistDTO) {
@@ -215,5 +220,28 @@ public class ApprovalService {
       }
     }
     log.info("[ApprovalService] processApproval End");
+  }
+
+  @Transactional
+  public void registerVacation(Member member, LocalDate startDate, LocalDate endDate) {
+    log.info("[ApprovalService] registerVacation Start");
+
+    startDate
+        .datesUntil(endDate.plusDays(1))
+        .forEach(
+            date -> {
+              if (!attendanceRepository.existsByMemberAndWorkDate(member, date)) {
+                Attendance vacation =
+                    Attendance.builder()
+                        .member(member)
+                        .workDate(date)
+                        .status(AttendanceStatus.VACATION)
+                        .startTime(date.atTime(9, 0))
+                        .endTime(date.atTime(18, 0))
+                        .build();
+                attendanceRepository.save(vacation);
+              }
+            });
+    log.info("[ApprovalService] registerVacation End");
   }
 }
