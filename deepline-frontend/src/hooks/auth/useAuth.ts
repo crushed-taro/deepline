@@ -3,6 +3,8 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { LoginRequest, SignUpRequest } from "@/types/auth/auth.types.ts";
 import { AuthApi } from "@/api/auth/AuthApi.ts";
+import { jwtDecode } from "jwt-decode";
+import type { CustomJwtPayload } from "@/types/auth/jwt.types.ts";
 
 export function useLogin() {
   const navigate = useNavigate();
@@ -45,4 +47,17 @@ export function useSignUp() {
       toast.error("회원가입에 실패했습니다. 입력값을 확인해주세요.");
     },
   });
+}
+
+export function useUserRole() {
+  const token = localStorage.getItem("accessToken");
+  if (!token) return null;
+
+  const decoded = jwtDecode<CustomJwtPayload>(token);
+  return decoded.role;
+}
+
+export function useIsAdmin() {
+  const role = useUserRole();
+  return role === "ROLE_ADMIN";
 }
