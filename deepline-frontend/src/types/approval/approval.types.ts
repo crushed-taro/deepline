@@ -2,10 +2,15 @@ import type { BaseResponse } from "@/types/BaseResponse.ts";
 
 export type ApprovalStatus = "WAITING" | "PENDING" | "APPROVED" | "REJECTED";
 
+export type ApprovalType = "GENERAL" | "VACATION";
+
 export interface ApprovalRegistRequest {
   title: string;
   content: string;
   approverCodes: number[];
+  type?: ApprovalType;
+  startDate?: string;
+  endDate?: string;
 }
 
 export interface ApprovalListResponse {
@@ -34,6 +39,9 @@ export interface ApprovalDetailResponse {
   statue: ApprovalStatus;
   createdAt: string;
   approvalLines: ApprovalLineResponse[];
+  type: ApprovalType;
+  startDate?: string;
+  endDate?: string;
 }
 
 export interface ApprovalProcessRequest {
