@@ -1,5 +1,7 @@
 package crushedtaro.deeplinebackend.domain.organization.entity;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
 
 import lombok.AllArgsConstructor;
@@ -27,4 +29,16 @@ public class Department extends BaseEntity {
 
   @Column(name = "dept_desc")
   private String deptDesc;
+
+  @Column(name = "is_deleted", nullable = false)
+  @Builder.Default
+  private String isDeleted = "N";
+
+  @Column(name = "deleted_at")
+  private LocalDateTime deletedAt;
+
+  public void withdraw() {
+    this.isDeleted = "Y";
+    this.deletedAt = LocalDateTime.now();
+  }
 }
