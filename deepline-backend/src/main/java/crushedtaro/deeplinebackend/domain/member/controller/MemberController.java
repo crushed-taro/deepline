@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
@@ -46,6 +47,7 @@ public class MemberController {
   }
 
   @GetMapping("/me")
+  @PreAuthorize("hasRole('USER')")
   public ResponseEntity<BaseResponse<MemberResponseDTO>> getMyInfo() {
 
     log.info("[MemberController] getMyInfo");
@@ -77,6 +79,7 @@ public class MemberController {
   }
 
   @PutMapping("/{memberId}/assign")
+  @PreAuthorize("hasRole('HR')")
   public ResponseEntity<BaseResponse<Void>> assignMember(
       @PathVariable String memberId, @RequestBody MemberAssignmentDTO assignmentDTO) {
 
