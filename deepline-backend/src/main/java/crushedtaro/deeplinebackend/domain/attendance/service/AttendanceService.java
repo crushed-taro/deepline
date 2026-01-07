@@ -118,4 +118,27 @@ public class AttendanceService {
                     attendance.getStatus()))
         .collect(Collectors.toList());
   }
+
+  @Transactional
+  public void registerVacation(Member member, LocalDate startDate, LocalDate endDate) {
+    log.info("[ApprovalService] registerVacation Start");
+
+    startDate
+        .datesUntil(endDate.plusDays(1))
+        .forEach(
+            date -> {
+              if (!attendanceRepository.existsByMemberAndWorkDate(member, date)) {
+                Attendance vacation =
+                    Attendance.builder()
+                        .member(member)
+                        .workDate(date)
+                        .status(AttendanceStatus.VACATION)
+                        .startTime(date.atTime(9, 0))
+                        .endTime(date.atTime(18, 0))
+                        .build();
+                attendanceRepository.save(vacation);
+              }
+            });
+    log.info("[ApprovalService] registerVacation End");
+  }
 }

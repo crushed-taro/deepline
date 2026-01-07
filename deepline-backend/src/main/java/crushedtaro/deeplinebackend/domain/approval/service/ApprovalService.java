@@ -1,6 +1,6 @@
 package crushedtaro.deeplinebackend.domain.approval.service;
 
-import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,10 +15,10 @@ import crushedtaro.deeplinebackend.domain.approval.dto.*;
 import crushedtaro.deeplinebackend.domain.approval.entity.Approval;
 import crushedtaro.deeplinebackend.domain.approval.entity.ApprovalLine;
 import crushedtaro.deeplinebackend.domain.approval.enums.ApprovalStatus;
+import crushedtaro.deeplinebackend.domain.approval.enums.ApprovalType;
 import crushedtaro.deeplinebackend.domain.approval.repository.ApprovalRepository;
-import crushedtaro.deeplinebackend.domain.attendance.entity.Attendance;
-import crushedtaro.deeplinebackend.domain.attendance.enums.AttendanceStatus;
 import crushedtaro.deeplinebackend.domain.attendance.repository.AttendanceRepository;
+import crushedtaro.deeplinebackend.domain.attendance.service.AttendanceService;
 import crushedtaro.deeplinebackend.domain.member.entity.Member;
 import crushedtaro.deeplinebackend.domain.member.repository.MemberRepository;
 
@@ -30,6 +30,7 @@ public class ApprovalService {
   private final ApprovalRepository approvalRepository;
   private final MemberRepository memberRepository;
   private final AttendanceRepository attendanceRepository;
+  private final AttendanceService attendanceService;
 
   @Transactional
   public void registerApproval(ApprovalRegistDTO approvalRegistDTO) {
@@ -42,12 +43,24 @@ public class ApprovalService {
             .findByMemberId(memberId)
             .orElseThrow(() -> new RuntimeException("회원 정보가 없습니다."));
 
+    ApprovalType type = ApprovalType.GENERAL;
+    if (approvalRegistDTO.type() != null) {
+      try {
+        type = ApprovalType.valueOf(approvalRegistDTO.type());
+      } catch (IllegalArgumentException e) {
+        throw new RuntimeException("유효하지 않은 결재 유형입니다.");
+      }
+    }
+
     Approval approval =
         Approval.builder()
             .title(approvalRegistDTO.title())
             .content(approvalRegistDTO.content())
             .member(member)
             .status(ApprovalStatus.PENDING)
+            .approvalType(type)
+            .startDate(approvalRegistDTO.startDate())
+            .endDate(approvalRegistDTO.endDate())
             .build();
 
     List<Integer> approverCodes = approvalRegistDTO.approverCodes();
@@ -216,32 +229,26 @@ public class ApprovalService {
         log.info("[ApprovalService] 다음 결재자로 넘어갔습니다.");
       } else {
         approval.changeStatus(ApprovalStatus.APPROVED);
+
+        if (approval.getApprovalType() == ApprovalType.VACATION
+            && approval.getStartDate() != null
+            && approval.getEndDate() != null) {
+
+          Member drafter = approval.getMember();
+
+          long days = ChronoUnit.DAYS.between(approval.getStartDate(), approval.getEndDate()) + 1;
+
+          drafter.useVacation((double) days);
+
+          attendanceService.registerVacation(
+              drafter, approval.getStartDate(), approval.getEndDate());
+
+          log.info("[ApprovalService] 휴가 등록이 완료되었습니다. {}일 차감", days);
+        }
+
         log.info("[ApprovalService] 최종 승인이 완료되었습니다.");
       }
     }
     log.info("[ApprovalService] processApproval End");
-  }
-
-  @Transactional
-  public void registerVacation(Member member, LocalDate startDate, LocalDate endDate) {
-    log.info("[ApprovalService] registerVacation Start");
-
-    startDate
-        .datesUntil(endDate.plusDays(1))
-        .forEach(
-            date -> {
-              if (!attendanceRepository.existsByMemberAndWorkDate(member, date)) {
-                Attendance vacation =
-                    Attendance.builder()
-                        .member(member)
-                        .workDate(date)
-                        .status(AttendanceStatus.VACATION)
-                        .startTime(date.atTime(9, 0))
-                        .endTime(date.atTime(18, 0))
-                        .build();
-                attendanceRepository.save(vacation);
-              }
-            });
-    log.info("[ApprovalService] registerVacation End");
   }
 }
