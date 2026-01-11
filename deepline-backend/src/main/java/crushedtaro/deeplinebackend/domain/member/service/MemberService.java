@@ -101,6 +101,7 @@ public class MemberService {
         member.getMemberName(),
         member.getMemberEmail(),
         member.getRemainVacation(),
+        member.getCreatedAt(),
         deptName,
         positionName);
   }
@@ -196,6 +197,7 @@ public class MemberService {
                   member.getMemberName(),
                   member.getMemberEmail(),
                   member.getRemainVacation(),
+                  member.getCreatedAt(),
                   deptName,
                   positionName);
             });

@@ -3,6 +3,7 @@ package crushedtaro.deeplinebackend.domain.organization.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import crushedtaro.deeplinebackend.domain.organization.repository.PositionReposi
 @RequestMapping("/api/v1/organizations")
 @RequiredArgsConstructor
 @Slf4j
+@PreAuthorize("hasRole('ADMIN')")
 public class OrganizationController {
 
   private final DepartmentRepository departmentRepository;
