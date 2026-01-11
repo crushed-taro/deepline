@@ -1,4 +1,4 @@
-import { Clock, FileText, Home, Inbox, Link, Send, User } from "lucide-react";
+import { ChevronRight, Link } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -8,61 +8,97 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
 } from "../ui/sidebar";
 import { useLocation } from "react-router-dom";
 import { useIsAdmin } from "@/hooks/auth/useAuth.ts";
-
-const items = [
-  {
-    title: "대시보드",
-    url: "/",
-    icon: Home,
-  },
-  {
-    title: "근태 관리",
-    url: "/attendance",
-    icon: Clock,
-  },
-  {
-    title: "전자결재",
-    icon: FileText,
-  },
-];
-
-const approvalItems = [
-  {
-    title: "결재 상신하기",
-    url: "/approvals/new",
-    icon: Send,
-  },
-  {
-    title: "기안함 (보낸 결재)",
-    url: "/approvals/sent",
-    icon: FileText,
-  },
-  {
-    title: "결재함 (받은 결재)",
-    url: "/approvals/received",
-    icon: Inbox,
-  },
-];
+import { adminMenu, sidebarMenu } from "@/config/menu.ts";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible.tsx";
 
 export function AppSidebar() {
   const location = useLocation();
   const isAdmin = useIsAdmin();
 
   return (
-    <Sidebar>
+    <Sidebar collapsible="icon">
       <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Deepline ERP</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {sidebarMenu.map((item) => {
+                if (!item.items) {
+                  return (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={location.pathname === item.url}
+                        tooltip={item.title}
+                      >
+                        <Link to={item.url}>
+                          <item.icon />
+                          <span>{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                }
+
+                return (
+                  <Collapsible
+                    key={item.title}
+                    asChild
+                    defaultOpen={location.pathname.startsWith(item.url)} // 현재 경로가 해당 메뉴면 열어둠
+                    className="group/collapsible"
+                  >
+                    <SidebarMenuItem>
+                      <CollapsibleTrigger asChild>
+                        <SidebarMenuButton tooltip={item.title}>
+                          <item.icon />
+                          <span>{item.title}</span>
+                          <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                        </SidebarMenuButton>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <SidebarMenuSub>
+                          {item.items.map((subItem) => (
+                            <SidebarMenuSubItem key={subItem.title}>
+                              <SidebarMenuSubButton
+                                asChild
+                                isActive={location.pathname === subItem.url}
+                              >
+                                <Link to={subItem.url}>
+                                  {subItem.icon && <subItem.icon className="mr-2 h-4 w-4" />}
+                                  <span>{subItem.title}</span>
+                                </Link>
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          ))}
+                        </SidebarMenuSub>
+                      </CollapsibleContent>
+                    </SidebarMenuItem>
+                  </Collapsible>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
         {isAdmin && (
           <SidebarGroup>
-            <SidebarGroupLabel>Deepline ERP</SidebarGroupLabel>
+            <SidebarGroupLabel>관리자 설정</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {items.map((item) => (
+                {adminMenu.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild isActive={location.pathname === item.url}>
-                      <Link to={item.url || "#"}>
+                    <SidebarMenuButton asChild isActive={location.pathname.startsWith(item.url)}>
+                      <Link to={item.url}>
                         <item.icon />
                         <span>{item.title}</span>
                       </Link>
@@ -73,39 +109,6 @@ export function AppSidebar() {
             </SidebarGroupContent>
           </SidebarGroup>
         )}
-
-        <SidebarGroup>
-          <SidebarGroupLabel>전자결재</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {approvalItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={location.pathname === item.url}>
-                    <Link to={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup className="mt-auto">
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link to="/profile">
-                    <User />
-                    <span>내 정보</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
       </SidebarContent>
     </Sidebar>
   );
