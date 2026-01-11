@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { LoginRequest, SignUpRequest } from "@/types/auth/auth.types.ts";
 import { AuthApi } from "@/api/auth/AuthApi.ts";
@@ -47,6 +47,23 @@ export function useSignUp() {
       toast.error("회원가입에 실패했습니다. 입력값을 확인해주세요.");
     },
   });
+}
+
+export function useLogout() {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const logout = () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("memberName");
+
+    queryClient.clear();
+
+    toast.success("로그아웃 되었습니다.");
+    navigate("/login", { replace: true });
+  };
+
+  return { logout };
 }
 
 export function useUserRole() {
