@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { DepartmentApi, PositionApi } from "@/api/organiztion/organizationApi.ts";
+import { DepartmentApi, PositionApi } from "@/api/organization/organizationApi.ts";
 import type { Department, Position } from "@/types/organization/organization.types.ts";
 import { toast } from "sonner";
 
 export function useDepartments() {
   return useQuery({
     queryKey: ["departments"],
-    queryFn: () => DepartmentApi.getDepartments,
+    queryFn: DepartmentApi.getDepartments,
   });
 }
 
@@ -45,7 +45,7 @@ export function useDeleteDepartment() {
 export function usePositions() {
   return useQuery({
     queryKey: ["positions"],
-    queryFn: () => PositionApi.getPositions,
+    queryFn: PositionApi.getPositions,
   });
 }
 
