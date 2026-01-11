@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -31,17 +33,33 @@ public class SecurityConfig {
   private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
   private final TokenProvider tokenProvider;
 
+  private final CorsProperties corsProperties;
+
+  @Bean
+  public RoleHierarchy roleHierarchy() {
+    return RoleHierarchyImpl.fromHierarchy(
+        """
+      ROLE_ADMIN > ROLE_HR
+      ROLE_HR > ROLE_USER
+      """);
+  }
+
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration config = new CorsConfiguration();
 
-    config.setAllowedOrigins(List.of("http://localhost:5173"));
+    String[] allowedOrigins = corsProperties.getAllowedOrigins();
+    String[] allowedMethods = corsProperties.getAllowedMethods();
+    String[] allowedHeaders = corsProperties.getAllowedHeaders();
+    String[] exposedHeaders = corsProperties.getExposedHeaders();
 
-    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+    config.setAllowedOrigins(List.of(allowedOrigins));
 
-    config.setAllowedHeaders(List.of("*"));
+    config.setAllowedMethods(List.of(allowedMethods));
 
-    config.setExposedHeaders(List.of("Authorization"));
+    config.setAllowedHeaders(List.of(allowedHeaders));
+
+    config.setExposedHeaders(List.of(exposedHeaders));
 
     config.setAllowCredentials(true);
 
@@ -61,16 +79,17 @@ public class SecurityConfig {
         .authorizeHttpRequests(
             auth -> {
               auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
-              auth.requestMatchers("/").authenticated();
               auth.requestMatchers("/api/v1/auth/**").permitAll();
 
               auth.requestMatchers(HttpMethod.PUT, "/api/v1/members/*/assign").hasRole("HR");
 
-              auth.requestMatchers(HttpMethod.GET, "/api/v1/members")
-                  .hasAnyRole("HR", "ADMIN", "USER");
+              auth.requestMatchers(HttpMethod.GET, "/api/v1/members").hasRole("USER");
 
-              auth.requestMatchers("/api/v1/members/**").permitAll();
-              auth.requestMatchers("/api/**").hasAnyRole("USER", "ADMIN", "HR");
+              auth.requestMatchers("/api/v1/members/**").hasRole("USER");
+
+              auth.requestMatchers("/api/v1/organization/**").hasRole("ADMIN");
+
+              auth.requestMatchers("/api/**").hasRole("USER");
               auth.anyRequest().permitAll();
             })
         .sessionManagement(
