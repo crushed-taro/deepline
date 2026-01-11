@@ -54,10 +54,10 @@ export function useUserRole() {
   if (!token) return null;
 
   const decoded = jwtDecode<CustomJwtPayload>(token);
-  return decoded.role;
+  return decoded.sub;
 }
 
 export function useIsAdmin() {
   const role = useUserRole();
-  return role === "ROLE_ADMIN";
+  return role === "admin";
 }
