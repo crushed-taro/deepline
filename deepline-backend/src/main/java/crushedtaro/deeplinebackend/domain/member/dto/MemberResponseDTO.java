@@ -5,5 +5,6 @@ public record MemberResponseDTO(
     String memberId,
     String memberName,
     String memberEmail,
+    double remainVacation,
     String deptName,
     String positionName) {}
