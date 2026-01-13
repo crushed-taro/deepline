@@ -21,6 +21,7 @@ import crushedtaro.deeplinebackend.domain.attendance.repository.AttendanceReposi
 import crushedtaro.deeplinebackend.domain.attendance.service.AttendanceService;
 import crushedtaro.deeplinebackend.domain.member.entity.Member;
 import crushedtaro.deeplinebackend.domain.member.repository.MemberRepository;
+import crushedtaro.deeplinebackend.domain.notification.service.NotificationProducer;
 
 @Service
 @Slf4j
@@ -31,6 +32,7 @@ public class ApprovalService {
   private final MemberRepository memberRepository;
   private final AttendanceRepository attendanceRepository;
   private final AttendanceService attendanceService;
+  private final NotificationProducer notificationProducer;
 
   @Transactional
   public void registerApproval(ApprovalRegistDTO approvalRegistDTO) {
@@ -95,7 +97,18 @@ public class ApprovalService {
       approval.getApprovalLines().add(approvalLine);
     }
 
-    approvalRepository.save(approval);
+    Approval savedApproval = approvalRepository.save(approval);
+
+    if (!approvalRegistDTO.approverCodes().isEmpty()) {
+      Integer firstApproverCode = approvalRegistDTO.approverCodes().get(0);
+
+      String approverId = memberRepository.findById(firstApproverCode).get().getMemberId();
+
+      notificationProducer.sendNotification(
+          approverId,
+          "새로운 결재 문서가 도착했습니다: " + savedApproval.getTitle(),
+          "/approvals/" + savedApproval.getApprovalCode());
+    }
 
     log.info("[ApprovalService] registerApproval End");
   }
