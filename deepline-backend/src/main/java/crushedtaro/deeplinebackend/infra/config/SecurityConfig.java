@@ -79,6 +79,10 @@ public class SecurityConfig {
         .authorizeHttpRequests(
             auth -> {
               auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
+
+              auth.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
+                  .permitAll();
+
               auth.requestMatchers("/api/v1/auth/**").permitAll();
 
               auth.requestMatchers(HttpMethod.PUT, "/api/v1/members/*/assign").hasRole("HR");

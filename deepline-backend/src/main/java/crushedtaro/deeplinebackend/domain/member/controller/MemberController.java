@@ -1,5 +1,8 @@
 package crushedtaro.deeplinebackend.domain.member.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -21,11 +24,13 @@ import crushedtaro.deeplinebackend.domain.member.service.MemberService;
 @RequestMapping("/api/v1/members")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "Member API", description = "회원 정보 조회, 수정 및 관리자 기능")
 public class MemberController {
 
   private final MemberService memberService;
 
   @PostMapping("/find-id")
+  @Operation(summary = "아이디 찾기", description = "이름과 이메일로 아이디를 찾습니다.")
   public ResponseEntity<BaseResponse<String>> findId(@RequestBody FindIdDTO findIdDTO) {
 
     log.info("[MemberController] findId : {}", findIdDTO);
@@ -36,6 +41,7 @@ public class MemberController {
   }
 
   @PostMapping("/reset-password")
+  @Operation(summary = "비밀번호 재설정", description = "비밀번호를 분실했을 때 새로운 비밀번호로 변경합니다.")
   public ResponseEntity<BaseResponse<Void>> resetPassword(
       @RequestBody ResetPasswordDTO resetPasswordDTO) {
 
@@ -48,6 +54,7 @@ public class MemberController {
 
   @GetMapping("/me")
   @PreAuthorize("hasRole('USER')")
+  @Operation(summary = "내 정보 조회", description = "로그인한 사용자의 상세 정보를 조회합니다.")
   public ResponseEntity<BaseResponse<MemberResponseDTO>> getMyInfo() {
 
     log.info("[MemberController] getMyInfo");
@@ -58,6 +65,7 @@ public class MemberController {
   }
 
   @PutMapping("/me")
+  @Operation(summary = "내 정보 수정", description = "이메일 등 내 정보를 수정합니다.")
   public ResponseEntity<BaseResponse<Void>> updateMyInfo(
       @RequestBody UpdateMemberDTO updateMemberDTO) {
 
@@ -69,6 +77,7 @@ public class MemberController {
   }
 
   @DeleteMapping("/me")
+  @Operation(summary = "회원 탈퇴", description = "서비스에서 탈퇴합니다 (논리적 삭제).")
   public ResponseEntity<BaseResponse<Void>> withdraw() {
 
     log.info("[MemberController] withdraw");
@@ -80,6 +89,7 @@ public class MemberController {
 
   @PutMapping("/{memberId}/assign")
   @PreAuthorize("hasRole('HR')")
+  @Operation(summary = "인사 발령 (관리자)", description = "특정 사원의 부서와 직급을 변경합니다.")
   public ResponseEntity<BaseResponse<Void>> assignMember(
       @PathVariable String memberId, @RequestBody MemberAssignmentDTO assignmentDTO) {
 
@@ -91,6 +101,7 @@ public class MemberController {
   }
 
   @GetMapping
+  @Operation(summary = "회원 목록 조회", description = "전체 회원 목록을 페이징하여 조회합니다.")
   public ResponseEntity<BaseResponse<Page<MemberResponseDTO>>> getMemberList(
       @PageableDefault(size = 10, sort = "memberCode", direction = Sort.Direction.DESC)
           Pageable pageable,
