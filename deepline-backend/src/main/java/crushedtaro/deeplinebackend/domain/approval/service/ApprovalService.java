@@ -228,6 +228,12 @@ public class ApprovalService {
     if (approvalProcessDTO.status() == ApprovalStatus.REJECTED) {
       approval.changeStatus(ApprovalStatus.REJECTED);
       log.info("[ApprovalService] 결재 문서가 반려되었습니다.");
+
+      notificationProducer.sendNotification(
+          approval.getMember().getMemberId(),
+          "결재 문서가 반려되었습니다. : " + approval.getTitle(),
+          "/approvals/" + approval.getApprovalCode());
+
     } else if (approvalProcessDTO.status() == ApprovalStatus.APPROVED) {
       int netxtOrder = myLine.getLineOrder() + 1;
 
@@ -240,6 +246,12 @@ public class ApprovalService {
       if (nextLine != null) {
         nextLine.processApproval(ApprovalStatus.PENDING, null);
         log.info("[ApprovalService] 다음 결재자로 넘어갔습니다.");
+
+        notificationProducer.sendNotification(
+            nextLine.getApproval().getMember().getMemberId(),
+            "결재 요청 문서가 도착했습니다. : " + approval.getTitle(),
+            "/approvals/" + approval.getApprovalCode());
+
       } else {
         approval.changeStatus(ApprovalStatus.APPROVED);
 
@@ -260,6 +272,11 @@ public class ApprovalService {
         }
 
         log.info("[ApprovalService] 최종 승인이 완료되었습니다.");
+
+        notificationProducer.sendNotification(
+            approval.getMember().getMemberId(),
+            "결재가 최종 승인되었습니다. : " + approval.getTitle(),
+            "/approvals/" + approval.getApprovalCode());
       }
     }
     log.info("[ApprovalService] processApproval End");
