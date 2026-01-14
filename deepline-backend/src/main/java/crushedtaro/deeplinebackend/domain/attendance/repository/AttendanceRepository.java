@@ -23,8 +23,8 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
   @Query(
       "SELECT a.workDate, a.status, COUNT(a) "
           + "FROM Attendance a "
-          + "WHERE FUNCTION('YEAR', a.workDate) = :year "
-          + "AND FUNCTION('MONTH', a.workDate) = :month "
+          + "WHERE year(a.workDate) = :year "
+          + "AND month(a.workDate) = :month "
           + "GROUP BY a.workDate, a.status "
           + "ORDER BY a.workDate ASC")
   List<Object[]> findDailyStatistics(@Param("year") int year, @Param("month") int month);
