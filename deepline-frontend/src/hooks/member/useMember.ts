@@ -55,7 +55,6 @@ export function useResetPassword() {
 }
 
 export function useGetMemberList(page: number, size: number, searchName?: string) {
-  console.log(page, size, searchName);
   return useQuery({
     queryKey: ["members", page, size, searchName],
     queryFn: () => MemberApi.getMemberList(page, size, searchName),

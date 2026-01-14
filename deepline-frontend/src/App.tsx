@@ -6,6 +6,16 @@ import FindId from "@/pages/member/FindId.tsx";
 import Home from "@/pages/Home.tsx";
 import MainLayout from "@/layouts/MainLayout.tsx";
 import ApprovalWrite from "@/pages/approval/ApprovalWrite.tsx";
+import ApprovalDetail from "@/pages/approval/ApprovalDetail.tsx";
+import ApprovalList from "@/pages/approval/ApprovalList.tsx";
+import RoleGuard from "@/components/common/RoleGuard.tsx";
+import OrganizationManage from "@/pages/admin/OrganizationManage.tsx";
+import NoticeList from "@/pages/notice/NoticeList.tsx";
+import { NoticeWrite } from "@/pages/notice/NoticeWrite.tsx";
+import NoticeDetail from "@/pages/notice/NoticeDetail.tsx";
+import MemberManage from "@/pages/admin/MemberManage.tsx";
+import ApprovalStatusChart from "@/pages/statistics/ApprovalStatusChart.tsx";
+import AttendanceTrendChart from "@/pages/statistics/AttendanceTrendChart.tsx";
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const token = localStorage.getItem("accessToken");
@@ -34,30 +44,77 @@ const router = createBrowserRouter([
       </PrivateRoute>
     ),
     children: [
-      {
-        index: true,
-        element: <Home />,
-      },
-      {
-        path: "attendance",
-        element: <div>근태 관리 페이지 (준비중)</div>,
-      },
+      { index: true, element: <Home /> },
+      { path: "attendance", element: <div>근태 관리 페이지 (준비중)</div> },
+
       {
         path: "approvals",
         children: [
+          { index: true, element: <Navigate to="received" replace /> },
+          { path: "received", element: <ApprovalList /> },
+          { path: "sent", element: <ApprovalList /> },
+
           { path: "new", element: <ApprovalWrite /> },
-          { path: "sent", element: <div>기안함 페이지 (준비중)</div> },
-          { path: "received", element: <div>결재함 페이지 (준비중)</div> },
+          { path: ":id", element: <ApprovalDetail /> },
         ],
       },
-      // { path: "profile", element: <MyPage /> },
+
+      {
+        path: "admin",
+        children: [
+          {
+            path: "organization",
+            element: (
+              <RoleGuard requiredRole="admin">
+                <OrganizationManage />
+              </RoleGuard>
+            ),
+          },
+          {
+            path: "members",
+            element: (
+              <RoleGuard requiredRole="admin">
+                <MemberManage />
+              </RoleGuard>
+            ),
+          },
+          {
+            path: "approvalstats",
+            element: (
+              <RoleGuard requiredRole="admin">
+                <ApprovalStatusChart />
+              </RoleGuard>
+            ),
+          },
+          {
+            path: "attendancestats",
+            element: (
+              <RoleGuard requiredRole="admin">
+                <AttendanceTrendChart />
+              </RoleGuard>
+            ),
+          },
+        ],
+      },
+
+      {
+        path: "notices",
+        children: [
+          { index: true, element: <NoticeList /> },
+          {
+            path: "new",
+            element: (
+              <RoleGuard requiredRole="admin">
+                <NoticeWrite />
+              </RoleGuard>
+            ),
+          },
+          { path: ":id", element: <NoticeDetail /> },
+        ],
+      },
     ],
   },
-
-  {
-    path: "*",
-    element: <Navigate to="/" replace />,
-  },
+  { path: "*", element: <Navigate to="/" replace /> },
 ]);
 
 function App() {
