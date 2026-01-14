@@ -20,4 +20,7 @@ public interface ApprovalRepository extends JpaRepository<Approval, Long> {
           + "and approvalLine.status = 'PENDING' "
           + "order by approval.createdAt desc")
   List<Approval> findWaitApprovals(@Param("memberCode") int memberCode);
+
+  @Query("select a.status, count(a) " + "from Approval a " + "group by a.status ")
+  List<Object[]> countApprovalsByStatus();
 }
