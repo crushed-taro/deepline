@@ -1,5 +1,11 @@
 package crushedtaro.deeplinebackend.domain.member.service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.UUID;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -7,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -103,7 +110,8 @@ public class MemberService {
         member.getRemainVacation(),
         member.getCreatedAt(),
         deptName,
-        positionName);
+        positionName,
+        member.getProfileUrl());
   }
 
   @Transactional
@@ -125,7 +133,7 @@ public class MemberService {
   }
 
   @Transactional
-  public void updateMyInfo(UpdateMemberDTO updateMemberDTO) {
+  public void updateMyInfo(UpdateMemberDTO updateMemberDTO, MultipartFile imageFile) {
     log.info("[MemberService] updateMyInfo() START");
 
     String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -142,6 +150,44 @@ public class MemberService {
     }
 
     member.updateMemberInfo(updateMemberDTO.memberName(), newEmail);
+
+    if (imageFile != null && !imageFile.isEmpty()) {
+      try {
+
+        String uploadDir = "uploads/";
+        Path uploadPath = Paths.get(uploadDir);
+
+        if (!Files.exists(uploadPath)) {
+          Files.createDirectories(uploadPath);
+        }
+
+        String oldProfileUrl = member.getProfileUrl();
+
+        String originalFilename = imageFile.getOriginalFilename();
+        String storeFileName = UUID.randomUUID() + "_" + originalFilename;
+        Path filePath = uploadPath.resolve(storeFileName);
+
+        Files.copy(imageFile.getInputStream(), filePath);
+
+        String fileUrl = "/images/" + storeFileName;
+        member.updateProfileUrl(fileUrl);
+
+        if (oldProfileUrl != null && oldProfileUrl.startsWith("/images/")) {
+          String oldFileName = oldProfileUrl.replace("/images/", "");
+          Path oldFilePath = uploadPath.resolve(oldFileName);
+
+          try {
+            Files.deleteIfExists(oldFilePath);
+            log.info("[MemberService] 기존 프로필 이미지 삭제 완료: {}", oldFileName);
+          } catch (IOException e) {
+            log.warn("[MemberService] 기존 프로필 이미지 삭제 실패: {}", oldFileName);
+          }
+        }
+
+      } catch (IOException e) {
+        throw new RuntimeException("프로필 이미지 저장 중 오류가 발생했습니다.", e);
+      }
+    }
 
     log.info("[MemberService] updateMyInfo() END");
   }
@@ -199,7 +245,8 @@ public class MemberService {
                   member.getRemainVacation(),
                   member.getCreatedAt(),
                   deptName,
-                  positionName);
+                  positionName,
+                  member.getProfileUrl());
             });
 
     log.info("[MemberService] getMemberList() END");

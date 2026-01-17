@@ -59,6 +59,9 @@ public class Member extends BaseEntity {
   @Builder.Default
   private double remainVacation = 15.0;
 
+  @Column(name = "profile_url")
+  private String profileUrl;
+
   public void useVacation(double days) {
     if (this.remainVacation < days) {
       throw new RuntimeException("잔여 휴가 일수가 부족합니다. (잔여: " + this.remainVacation + ")");
@@ -86,5 +89,9 @@ public class Member extends BaseEntity {
 
   public void assignPosition(Position position) {
     this.position = position;
+  }
+
+  public void updateProfileUrl(String profileUrl) {
+    this.profileUrl = profileUrl;
   }
 }

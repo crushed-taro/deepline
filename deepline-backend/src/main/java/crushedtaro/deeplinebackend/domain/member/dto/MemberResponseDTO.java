@@ -10,4 +10,5 @@ public record MemberResponseDTO(
     double remainVacation,
     LocalDateTime createdAt,
     String deptName,
-    String positionName) {}
+    String positionName,
+    String profileUrl) {}
