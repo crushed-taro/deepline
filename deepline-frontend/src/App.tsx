@@ -16,6 +16,7 @@ import NoticeDetail from "@/pages/notice/NoticeDetail.tsx";
 import MemberManage from "@/pages/admin/MemberManage.tsx";
 import ApprovalStatusChart from "@/pages/statistics/ApprovalStatusChart.tsx";
 import AttendanceTrendChart from "@/pages/statistics/AttendanceTrendChart.tsx";
+import Profile from "@/pages/member/Profile.tsx";
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const token = localStorage.getItem("accessToken");
@@ -45,6 +46,7 @@ const router = createBrowserRouter([
     ),
     children: [
       { index: true, element: <Home /> },
+      { path: "profile", element: <Profile /> },
       { path: "attendance", element: <div>근태 관리 페이지 (준비중)</div> },
 
       {

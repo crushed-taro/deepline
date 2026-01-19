@@ -10,6 +10,14 @@ import { Trash2, Plus, Search, UserCheck } from "lucide-react";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import type { ApprovalType } from "@/types/approval/approval.types.ts";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select.tsx";
 
 interface SelectedApprover {
   memberCode: number;
@@ -26,8 +34,11 @@ export default function ApprovalWrite() {
   const [content, setContent] = useState("");
   const [approvers, setApprovers] = useState<SelectedApprover[]>([]);
 
+  const [type, setType] = useState<ApprovalType>("GENERAL");
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
+
   const [searchTerm, setSearchTerm] = useState("");
-  const [isSearchActive, setIsSearchActive] = useState(false);
 
   const { data: memberPage } = useGetMemberList(0, 5, searchTerm);
 
@@ -76,10 +87,19 @@ export default function ApprovalWrite() {
       return;
     }
 
+    if (type === "VACATION") {
+      if (!startDate) return toast.error("시작일을 선택해주세요.");
+      if (!endDate) return toast.error("종료일을 선택해주세요.");
+      if (startDate > endDate) return toast.error("종료일은 시작일보다 빠를 수 없습니다.");
+    }
+
     register({
       title,
       content,
       approverCodes: approvers.map((a) => a.memberCode),
+      type,
+      startDate: type === "VACATION" ? startDate : "",
+      endDate: type === "VACATION" ? endDate : "",
     });
   };
 
@@ -115,6 +135,42 @@ export default function ApprovalWrite() {
               </div>
 
               <div className="space-y-2">
+                <Label>결재 유형</Label>
+                <Select value={type} onValueChange={(v) => setType(v as ApprovalType)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="GENERAL">일반 결재</SelectItem>
+                    <SelectItem value="VACATION">휴가</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {type === "VACATION" && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>시작일</Label>
+                    <Input
+                      type="date"
+                      value={startDate}
+                      onChange={(e) => {
+                        setStartDate(e.target.value);
+                      }}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>종료일</Label>
+                    <Input
+                      type="date"
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-2">
                 <Label htmlFor="content">내용</Label>
                 <textarea
                   id="content"
@@ -144,11 +200,8 @@ export default function ApprovalWrite() {
                     placeholder="이름으로 검색"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") setIsSearchActive(true);
-                    }}
                   />
-                  <Button size="icon" onClick={() => setIsSearchActive(true)}>
+                  <Button size="icon" variant="ghost">
                     <Search className="h-4 w-4" />
                   </Button>
                 </div>
