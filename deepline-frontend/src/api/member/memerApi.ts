@@ -5,7 +5,6 @@ import type {
   GetMemberListApiResponse,
   GetMyInfoApiResponse,
   ResetPasswordRequest,
-  UpdateMyInfoRequest,
 } from "@/types/member/member.types.ts";
 import { deeplineApi } from "@/lib/api/clients.ts";
 import type { BaseResponse } from "@/types/BaseResponse.ts";
@@ -34,8 +33,12 @@ const getMyInfo = async (): Promise<GetMyInfoApiResponse> => {
   return response.data;
 };
 
-const updateMyInfo = async (data: UpdateMyInfoRequest): Promise<BaseResponse<void>> => {
-  const response = await deeplineApi.put<BaseResponse<void>>("/members/me", data);
+const updateMyInfo = async (data: FormData): Promise<BaseResponse<void>> => {
+  const response = await deeplineApi.put<BaseResponse<void>>("/members/me", data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 
   console.info("updateMyInfo response : ", response);
 

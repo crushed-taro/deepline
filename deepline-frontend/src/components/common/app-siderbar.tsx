@@ -1,4 +1,4 @@
-import { ChevronRight, Link } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -12,7 +12,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "../ui/sidebar";
-import { useLocation } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { useIsAdmin } from "@/hooks/auth/useAuth.ts";
 import { adminMenu, sidebarMenu } from "@/config/menu.ts";
 import {
@@ -20,6 +20,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible.tsx";
+import { cn } from "@/lib/utils.ts";
 
 export function AppSidebar() {
   const location = useLocation();
@@ -33,18 +34,23 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {sidebarMenu.map((item) => {
-                if (!item.items) {
+                if (!item.items?.length) {
                   return (
                     <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton
-                        asChild
-                        isActive={location.pathname === item.url}
-                        tooltip={item.title}
-                      >
-                        <Link to={item.url}>
-                          <item.icon />
+                      <SidebarMenuButton asChild tooltip={item.title}>
+                        <NavLink
+                          to={item.url}
+                          end
+                          className={({ isActive }) =>
+                            cn(
+                              "flex items-center gap-2",
+                              isActive && "bg-accent text-accent-foreground"
+                            )
+                          }
+                        >
+                          <item.icon className="h-4 w-4 shrink-0" />
                           <span>{item.title}</span>
-                        </Link>
+                        </NavLink>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   );
@@ -54,29 +60,39 @@ export function AppSidebar() {
                   <Collapsible
                     key={item.title}
                     asChild
-                    defaultOpen={location.pathname.startsWith(item.url)} // 현재 경로가 해당 메뉴면 열어둠
+                    defaultOpen={location.pathname.startsWith(item.url)}
                     className="group/collapsible"
                   >
                     <SidebarMenuItem>
                       <CollapsibleTrigger asChild>
                         <SidebarMenuButton tooltip={item.title}>
-                          <item.icon />
-                          <span>{item.title}</span>
+                          <div className="flex items-center gap-2">
+                            <item.icon className="h-4 w-4 shrink-0" />
+                            <span>{item.title}</span>
+                          </div>
+
                           <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                         </SidebarMenuButton>
                       </CollapsibleTrigger>
+
                       <CollapsibleContent>
                         <SidebarMenuSub>
                           {item.items.map((subItem) => (
                             <SidebarMenuSubItem key={subItem.title}>
-                              <SidebarMenuSubButton
-                                asChild
-                                isActive={location.pathname === subItem.url}
-                              >
-                                <Link to={subItem.url}>
-                                  {subItem.icon && <subItem.icon className="mr-2 h-4 w-4" />}
+                              <SidebarMenuSubButton asChild>
+                                <NavLink
+                                  to={subItem.url}
+                                  end
+                                  className={({ isActive }) =>
+                                    cn(
+                                      "flex items-center gap-2",
+                                      isActive && "bg-accent text-accent-foreground"
+                                    )
+                                  }
+                                >
+                                  <subItem.icon className="h-4 w-4 shrink-0" />
                                   <span>{subItem.title}</span>
-                                </Link>
+                                </NavLink>
                               </SidebarMenuSubButton>
                             </SidebarMenuSubItem>
                           ))}
@@ -97,11 +113,20 @@ export function AppSidebar() {
               <SidebarMenu>
                 {adminMenu.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild isActive={location.pathname.startsWith(item.url)}>
-                      <Link to={item.url}>
-                        <item.icon />
+                    <SidebarMenuButton asChild tooltip={item.title}>
+                      <NavLink
+                        to={item.url}
+                        end
+                        className={({ isActive }) =>
+                          cn(
+                            "flex items-center gap-2",
+                            isActive && "bg-accent text-accent-foreground"
+                          )
+                        }
+                      >
+                        <item.icon className="h-4 w-4 shrink-0" />
                         <span>{item.title}</span>
-                      </Link>
+                      </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
