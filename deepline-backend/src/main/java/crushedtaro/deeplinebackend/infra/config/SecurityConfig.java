@@ -85,6 +85,9 @@ public class SecurityConfig {
 
               auth.requestMatchers("/api/v1/auth/**").permitAll();
 
+              auth.requestMatchers("/api/v1/members/find-id").permitAll();
+              auth.requestMatchers("/api/v1/members/reset-password").permitAll();
+
               auth.requestMatchers(HttpMethod.PUT, "/api/v1/members/*/assign").hasRole("HR");
 
               auth.requestMatchers(HttpMethod.GET, "/api/v1/members").hasRole("USER");
