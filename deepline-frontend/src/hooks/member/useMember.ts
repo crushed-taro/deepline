@@ -78,3 +78,21 @@ export function useAssignMember() {
     },
   });
 }
+
+export function useGetMyInfo() {
+  return useQuery({
+    queryKey: ["my-info"],
+    queryFn: MemberApi.getMyInfo,
+  });
+}
+
+export function useUpdateMyInfo() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: FormData) => MemberApi.updateMyInfo(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["my-info"] });
+    },
+  });
+}

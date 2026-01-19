@@ -8,6 +8,7 @@ export interface NoticeRequest {
 }
 
 export interface NoticeResponse {
+  notice: any;
   noticeCode: number;
   title: string;
   content: string;
