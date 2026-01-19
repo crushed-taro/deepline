@@ -33,8 +33,11 @@ export interface MemberResponse {
   memberId: string;
   memberName: string;
   memberEmail: string;
+  remainVacation: number;
+  createdAt: string;
   deptName: string;
   positionName: string;
+  profileUrl?: string;
 }
 
 export interface SortInfo {
