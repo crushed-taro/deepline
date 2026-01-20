@@ -36,7 +36,7 @@ export default function FindId() {
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">Deepline ERP</CardTitle>
           <CardDescription className="text-center">
-            사내 시스템 접속을 위해 로그인해주세요.
+            사내 시스템 접속을 위해 아이디를 찾아주세요.
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
@@ -72,7 +72,7 @@ export default function FindId() {
               />
             </div>
           </CardContent>
-          <CardFooter className="flex flex-col gap-3">
+          <CardFooter className="flex flex-col gap-3 pt-6">
             <Button type="submit" className="w-full" disabled={isPending}>
               {isPending ? "아이디 찾는 중..." : "아이디 찾기"}
             </Button>

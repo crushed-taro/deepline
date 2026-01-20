@@ -106,7 +106,7 @@ export default function Signup() {
               />
             </div>
           </CardContent>
-          <CardFooter className="flex flex-col gap-3">
+          <CardFooter className="flex flex-col gap-3 pt-6">
             <Button type="submit" className="w-full" disabled={isPending}>
               {isPending ? "회원가입 중..." : "회원가입"}
             </Button>

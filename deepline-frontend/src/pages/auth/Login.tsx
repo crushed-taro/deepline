@@ -74,7 +74,7 @@ export default function Login() {
               />
             </div>
           </CardContent>
-          <CardFooter className="flex flex-col gap-3">
+          <CardFooter className="flex flex-col gap-3 pt-6">
             <Button type="submit" className="w-full" disabled={isPending}>
               {isPending ? "로그인 중..." : "로그인"}
             </Button>
