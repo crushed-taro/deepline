@@ -66,4 +66,11 @@ public class OrganizationController {
     return BaseResponseFactory.success(
         OrganizationStatus.CREATE_POSITION_SUCCESS, positionRepository.save(position));
   }
+
+  @DeleteMapping("/positions/{id}")
+  @Operation(summary = "직급 삭제", description = "특정 직급을 삭제합니다.")
+  public ResponseEntity<BaseResponse<Void>> deletePosition(@PathVariable Long id) {
+    positionRepository.deleteById(Math.toIntExact(id));
+    return BaseResponseFactory.success(OrganizationStatus.DELETE_POSITION_SUCCESS);
+  }
 }
