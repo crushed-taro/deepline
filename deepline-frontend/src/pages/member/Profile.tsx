@@ -17,7 +17,6 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import defaultProfile from "@/assets/images/default-profile.jpg";
-import { resolveBackendUrl } from "@/lib/url.ts";
 
 export default function Profile() {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -41,7 +40,7 @@ export default function Profile() {
   useEffect(() => {
     if (member) {
       if (member.profileUrl) {
-        setPreviewImage(resolveBackendUrl(member.profileUrl));
+        setPreviewImage(member.profileUrl);
       } else {
         setPreviewImage(null);
       }
