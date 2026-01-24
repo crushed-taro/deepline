@@ -11,18 +11,14 @@ export default function MainLayout() {
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
-
     if (!token) return;
 
-    const eventSource = new EventSourcePolyfill(
-      "http://localhost:8080/api/v1/notifications/subscribe",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        heartbeatTimeout: 86400000,
-      }
-    );
+    const eventSource = new EventSourcePolyfill("/api/v1/notifications/subscribe", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      heartbeatTimeout: 86400000,
+    });
 
     eventSource.onopen = () => {
       console.log("[SSE] Connected!");

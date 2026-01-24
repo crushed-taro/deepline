@@ -9,12 +9,13 @@ export interface ApiConfig {
 
 export const createApiClient = (config: ApiConfig): AxiosInstance => {
   const axiosConfig: CreateAxiosDefaults = {
-    baseURL: `${config.serverUrl || config.defaultUrl}/api/v1`,
+    baseURL: import.meta.env.VITE_DEEPLINE_SERVER_URL || "/api/v1",
     timeout: config.timeout || 5000,
     headers: {
       "Content-Type": "application/json",
       ...config.headers,
     },
+    withCredentials: true,
   };
 
   const instance = axios.create(axiosConfig);

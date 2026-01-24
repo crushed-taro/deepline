@@ -22,7 +22,7 @@ import {
 
 export default function AttendanceTrendChart() {
   const today = new Date();
-  const [year, setYear] = useState(today.getFullYear());
+  const [year] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth() + 1);
 
   const { data: attendanceStatusData } = useGetAttendanceStats(year, month);
