@@ -6,14 +6,13 @@ import type {
   MemberAssignmentRequest,
   ResetPasswordRequest,
 } from "@/types/member/member.types.ts";
-import type { BaseResponse } from "@/types/BaseResponse.ts";
 import { MemberApi } from "@/api/member/memerApi.ts";
 
 export function useFindId() {
   const navigate = useNavigate();
 
   return useMutation({
-    mutationFn: (data: FindIdRequest) => MemberApi.findId(data) as Promise<BaseResponse<string>>,
+    mutationFn: (data: FindIdRequest) => MemberApi.findId(data),
     onSuccess: (response) => {
       const foundId = response.result;
 
@@ -35,8 +34,7 @@ export function useResetPassword() {
   const navigate = useNavigate();
 
   return useMutation({
-    mutationFn: (data: ResetPasswordRequest) =>
-      MemberApi.resetPassword(data) as Promise<BaseResponse<void>>,
+    mutationFn: (data: ResetPasswordRequest) => MemberApi.resetPassword(data),
     onSuccess: (response) => {
       const foundId = response.result;
 

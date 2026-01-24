@@ -17,6 +17,7 @@ import MemberManage from "@/pages/admin/MemberManage.tsx";
 import ApprovalStatusChart from "@/pages/statistics/ApprovalStatusChart.tsx";
 import AttendanceTrendChart from "@/pages/statistics/AttendanceTrendChart.tsx";
 import Profile from "@/pages/member/Profile.tsx";
+import ResetPassword from "@/pages/member/ResetPassword.tsx";
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const token = localStorage.getItem("accessToken");
@@ -35,6 +36,10 @@ const router = createBrowserRouter([
   {
     path: "/find-id",
     element: <FindId />,
+  },
+  {
+    path: "/reset-password",
+    element: <ResetPassword />,
   },
 
   {

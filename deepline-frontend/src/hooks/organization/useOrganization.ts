@@ -64,3 +64,19 @@ export function useCreatePosition() {
     },
   });
 }
+
+export function useDeletePosition() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: number) => PositionApi.deletePosition(data),
+    onSuccess: () => {
+      toast.success("직급이 삭제되었습니다.");
+      queryClient.invalidateQueries({ queryKey: ["positions"] });
+    },
+    onError: (err) => {
+      console.error(err);
+      toast.error("직급 삭제 실패");
+    },
+  });
+}

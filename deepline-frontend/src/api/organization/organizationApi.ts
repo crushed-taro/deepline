@@ -29,6 +29,11 @@ const createPosition = async (positionName: string) => {
   return response.data;
 };
 
+const deletePosition = async (positionId: number) => {
+  const response = await deeplineApi.delete(`/organizations/positions/${positionId}`);
+  return response.data;
+};
+
 export const DepartmentApi = {
   getDepartments,
   createDepartment,
@@ -38,4 +43,5 @@ export const DepartmentApi = {
 export const PositionApi = {
   getPositions,
   createPosition,
+  deletePosition,
 };

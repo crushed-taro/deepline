@@ -3,6 +3,7 @@ import {
   useCreateDepartment,
   useCreatePosition,
   useDeleteDepartment,
+  useDeletePosition,
   useDepartments,
   usePositions,
 } from "@/hooks/organization/useOrganization.ts";
@@ -18,6 +19,7 @@ export default function OrganizationManage() {
   const { data: deptData, isLoading: isDeptLoading } = useDepartments();
   const { mutate: createDept, isPending: isCreateDeptPending } = useCreateDepartment();
   const { mutate: deleteDept } = useDeleteDepartment();
+  const { mutate: deletePos } = useDeletePosition();
 
   const [newPosName, setNewPosName] = useState("");
   const { data: posData, isLoading: isPosLoading } = usePositions();
@@ -44,8 +46,14 @@ export default function OrganizationManage() {
   };
 
   const handleDeleteDept = (id: number, name: string) => {
-    if (confirm(`'${name} 부서를 정말 삭제하시겠습니까?`)) {
+    if (confirm(`'${name}' 부서를 정말 삭제하시겠습니까?`)) {
       deleteDept(id);
+    }
+  };
+
+  const handleDeletePos = (id: number, name: string) => {
+    if (confirm(`'${name}' 직급을 정말 삭제하시겠습니까?`)) {
+      deletePos(id);
     }
   };
 
@@ -144,7 +152,12 @@ export default function OrganizationManage() {
                     className="flex items-center justify-between p-3 border rounded-md bg-white shadow-sm"
                   >
                     <span className="font-medium">{pos.positionName}</span>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-red-600">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-gray-400 hover:text-red-600"
+                      onClick={() => handleDeletePos(pos.positionCode, pos.positionName)}
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
