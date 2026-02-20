@@ -92,9 +92,16 @@ public class SecurityConfig {
 
               auth.requestMatchers(HttpMethod.GET, "/api/v1/members").hasRole("USER");
 
-              auth.requestMatchers("/api/v1/members/**").hasRole("USER");
+              auth.requestMatchers("/api/v1/members/**")
+                  //                      .hasRole("USER");
+                  .permitAll();
 
-              auth.requestMatchers("/api/v1/organization/**").hasRole("ADMIN");
+              auth.requestMatchers(HttpMethod.GET, "/api/v1/organizations/**")
+                  //                  .hasAnyRole("USER", "HR", "ADMIN");
+                  .permitAll();
+              auth.requestMatchers("/api/v1/organizations/**").hasRole("ADMIN");
+
+              auth.requestMatchers("/api/v1/chat/**").permitAll();
 
               auth.requestMatchers("/api/**").hasRole("USER");
               auth.anyRequest().permitAll();
