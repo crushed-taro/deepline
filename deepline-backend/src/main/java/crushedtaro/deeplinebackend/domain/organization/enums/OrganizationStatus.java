@@ -13,6 +13,7 @@ public enum OrganizationStatus implements ResponseStatus {
   READ_DEPARTMENT_SUCCESS(HttpStatus.OK, "DEPARTMENT_001", "부서 정보 조회 성공"),
   CREATE_DEPARTMENT_SUCCESS(HttpStatus.OK, "DEPARTMENT_002", "부서 생성 성공"),
   DELETE_DEPARTMENT_SUCCESS(HttpStatus.OK, "DEPARTMENT_003", "부서 삭제 성공"),
+  READ_BY_DEPARTMENT_SUCCESS(HttpStatus.OK, "DEPARTMENT_004", "특정 부서 조회 성공"),
   READ_POSITION_SUCCESS(HttpStatus.OK, "POSITION_001", "직급 정보 조회 성공"),
   CREATE_POSITION_SUCCESS(HttpStatus.OK, "POSITION_002", "직급 생성 성공"),
   DELETE_POSITION_SUCCESS(HttpStatus.OK, "POSITION_003", "직급 삭제 성공");
