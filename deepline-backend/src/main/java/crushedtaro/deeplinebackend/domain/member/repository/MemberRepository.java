@@ -1,5 +1,6 @@
 package crushedtaro.deeplinebackend.domain.member.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -26,4 +27,6 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
 
   @EntityGraph(attributePaths = {"department", "position"})
   Page<Member> findByMemberNameContaining(String memberName, Pageable pageable);
+
+  List<Member> findAllByDepartment_DeptCode(int departmentCode);
 }
