@@ -2,6 +2,7 @@ package crushedtaro.deeplinebackend.domain.notification.service;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Service;
@@ -33,15 +34,29 @@ public class NotificationService {
     emitters.put(memberId, emitter);
     log.info("[SSE] New Client Subscribed: {}", memberId);
 
-    emitter.onCompletion(() -> emitters.remove(memberId));
-    emitter.onTimeout(() -> emitters.remove(memberId));
-    emitter.onError((e) -> emitters.remove(memberId));
+    Runnable onDisconnect =
+        () -> {
+          emitters.remove(memberId);
+          log.info("[SSE] Client Disconnected : {}", memberId);
+          broadcastToOthers("USER_OFFLINE", memberId, memberId);
+        };
+
+    emitter.onCompletion(onDisconnect);
+    emitter.onTimeout(onDisconnect);
+    emitter.onError((e) -> onDisconnect.run());
 
     try {
       emitter.send(SseEmitter.event().name("connect").data("Connected!"));
+
+      Set<String> onlineUsers = emitters.keySet();
+
+      emitter.send(SseEmitter.event().name("PRESENCE_LIST").data(onlineUsers));
     } catch (IOException e) {
       log.error("[SSE] Connection Error", e);
+      emitters.remove(memberId);
     }
+
+    broadcastToOthers("USER_ONLINE", memberId, memberId);
 
     return emitter;
   }
@@ -73,5 +88,18 @@ public class NotificationService {
         log.error("[SSE] Send Failed", e);
       }
     }
+  }
+
+  private void broadcastToOthers(String eventName, Object data, String excludeMemberId) {
+    emitters.forEach(
+        (id, emitter) -> {
+          if (!id.equals(excludeMemberId)) {
+            try {
+              emitter.send(SseEmitter.event().name(eventName).data(data));
+            } catch (IOException e) {
+              emitters.remove(id);
+            }
+          }
+        });
   }
 }
