@@ -1,3 +1,3 @@
 package crushedtaro.deeplinebackend.domain.organization.dto;
 
-public record DepartmentDTO(Long deptCode, String deptName) {}
+public record DepartmentDTO(int deptCode, String deptName) {}
