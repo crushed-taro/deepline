@@ -1,5 +1,7 @@
 package crushedtaro.deeplinebackend.domain.member.controller;
 
+import java.util.List;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -113,5 +115,12 @@ public class MemberController {
     Page<MemberResponseDTO> memberList = memberService.getMemberList(pageable, searchName);
 
     return BaseResponseFactory.success(MemberStatus.READ_LIST_SUCCESS, memberList);
+  }
+
+  @GetMapping("/by-department/{deptCode}")
+  public ResponseEntity<BaseResponse<List<MemberResponseDTO>>> getMembersByDepartment(
+      @PathVariable int deptCode) {
+    return BaseResponseFactory.success(
+        MemberStatus.READ_LIST_SUCCESS, memberService.findMembersByDepartment(deptCode));
   }
 }
