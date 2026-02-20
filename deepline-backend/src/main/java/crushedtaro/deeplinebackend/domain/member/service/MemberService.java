@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -252,5 +254,12 @@ public class MemberService {
     log.info("[MemberService] getMemberList() END");
 
     return memberResponseDTOPage;
+  }
+
+  @Transactional(readOnly = true)
+  public List<MemberResponseDTO> findMembersByDepartment(int departmentCode) {
+    return memberRepository.findAllByDepartment_DeptCode(departmentCode).stream()
+        .map(MemberResponseDTO::from)
+        .collect(Collectors.toList());
   }
 }
