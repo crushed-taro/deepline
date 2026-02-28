@@ -17,19 +17,19 @@ const registerApproval = async (data: ApprovalRegistRequest): Promise<BaseRespon
 
 const getSentApprovals = async (): Promise<ApprovalListApiResponse> => {
   const response = await deeplineApi.get<ApprovalListApiResponse>("/approvals/sent");
-  console.info("getSentApprovals response : ", response);
+  console.debug("getSentApprovals response : ", response);
   return response.data;
 };
 
 const getReceivedApprovals = async (): Promise<ApprovalListApiResponse> => {
   const response = await deeplineApi.get<ApprovalListApiResponse>("/approvals/received");
-  console.info("getReceivedApprovals response : ", response);
+  console.debug("getReceivedApprovals response : ", response);
   return response.data;
 };
 
 const getApprovalDetail = async (approvalCode: number): Promise<ApprovalDetailApiResponse> => {
   const response = await deeplineApi.get<ApprovalDetailApiResponse>(`/approvals/${approvalCode}`);
-  console.info("getApprovalDetail response : ", response);
+  console.debug("getApprovalDetail response : ", response);
   return response.data;
 };
 
