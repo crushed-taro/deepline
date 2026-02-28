@@ -28,7 +28,7 @@ const resetPassword = async (data: ResetPasswordRequest): Promise<BaseResponse<v
 const getMyInfo = async (): Promise<GetMyInfoApiResponse> => {
   const response = await deeplineApi.get<GetMyInfoApiResponse>("/members/me");
 
-  console.info("getMyInfo response : ", response);
+  console.debug("getMyInfo response : ", response);
 
   return response.data;
 };
@@ -73,6 +73,14 @@ const getMemberList = async (
   return response.data;
 };
 
+const getMembersByDept = async (deptCode: number): Promise<GetMemberListApiResponse> => {
+  const response = await deeplineApi.get<GetMemberListApiResponse>(
+    `/members/by-department/${deptCode}`
+  );
+  // console.log("members response:", response.data);
+  return response.data;
+};
+
 const assignMember = async (
   memberId: string,
   data: AssignMemberRequest
@@ -92,4 +100,5 @@ export const MemberApi = {
   withDraw,
   getMemberList,
   assignMember,
+  getMembersByDept,
 };
