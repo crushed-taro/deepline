@@ -12,6 +12,10 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      '/ws-chat': {
+        target: process.env.VITE_DEEPLINE_SERVER_URL || 'http://localhost:8080',
+        ws: true,
+      }
     },
   },
   resolve: {
@@ -19,4 +23,7 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  define: {
+    global: "window",
+  }
 })
