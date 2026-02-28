@@ -60,6 +60,15 @@ export function useGetMemberList(page: number, size: number, searchName?: string
   });
 }
 
+export function useGetMembersByDept(deptCode: number | undefined) {
+  return useQuery({
+    queryKey: ["membersByDept", deptCode],
+    queryFn: () => MemberApi.getMembersByDept(deptCode as number),
+    enabled: !!deptCode,
+    select: (res) => res.result,
+  });
+}
+
 export function useAssignMember() {
   const queryClient = useQueryClient();
 
