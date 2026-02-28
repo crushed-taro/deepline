@@ -19,6 +19,7 @@ import crushedtaro.deeplinebackend.domain.approval.enums.ApprovalType;
 import crushedtaro.deeplinebackend.domain.approval.repository.ApprovalRepository;
 import crushedtaro.deeplinebackend.domain.attendance.repository.AttendanceRepository;
 import crushedtaro.deeplinebackend.domain.attendance.service.AttendanceService;
+import crushedtaro.deeplinebackend.domain.audit.annotation.AuditLog;
 import crushedtaro.deeplinebackend.domain.member.entity.Member;
 import crushedtaro.deeplinebackend.domain.member.repository.MemberRepository;
 import crushedtaro.deeplinebackend.domain.notification.service.NotificationProducer;
@@ -198,6 +199,7 @@ public class ApprovalService {
         approvalLineDTOS);
   }
 
+  @AuditLog(actionType = "PROCESS", targetName = "APPROVAL")
   @Transactional
   public void processApproval(Long approvalCode, ApprovalProcessDTO approvalProcessDTO) {
     log.info("[ApprovalService] processApproval Start");
