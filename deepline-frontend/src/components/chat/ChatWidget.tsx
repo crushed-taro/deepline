@@ -58,10 +58,10 @@ const DepartmentToggleGroup = ({
         <div className="bg-gray-50 p-2 space-y-1 border-t border-gray-100 shadow-inner">
           {isLoading ? (
             <div className="text-center py-2 text-xs text-gray-400">구성원 로딩 중...</div>
-          ) : !memberData || memberData.length === 0 ? (
+          ) : !memberData || memberData.content.length === 0 ? (
             <div className="text-center py-2 text-xs text-gray-400">구성원이 없습니다.</div>
           ) : (
-            memberData.map((member: MemberSimple) => {
+            memberData.content.map((member: MemberSimple) => {
               const isOnline = onlineUsers.includes(member.memberId);
 
               return (
