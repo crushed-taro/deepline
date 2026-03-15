@@ -20,4 +20,4 @@ jobs:
       - name: Build and Restart Docker Containers
         run: |
           cd /docker/deepline
-          docker-compose up --build -d
+          docker compose up --build -d
