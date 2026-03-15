@@ -1,0 +1,23 @@
+name: DeepLine Auto Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout latest code
+        uses: actions/checkout@v3
+
+      - name: Sync files to workspace
+        run: |
+          rsync -av --exclude='.git' --exclude='application.yml' --exclude='uploads' --exclude='*.tar' ./ /docker/deepline/
+
+      - name: Build and Restart Docker Containers
+        run: |
+          cd /docker/deepline
+          docker-compose up --build -d
