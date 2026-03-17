@@ -58,43 +58,53 @@ const DepartmentToggleGroup = ({
         <div className="bg-gray-50 p-2 space-y-1 border-t border-gray-100 shadow-inner">
           {isLoading ? (
             <div className="text-center py-2 text-xs text-gray-400">구성원 로딩 중...</div>
-          ) : !memberData || memberData.content.length === 0 ? (
-            <div className="text-center py-2 text-xs text-gray-400">구성원이 없습니다.</div>
           ) : (
-            memberData.content.map((member: MemberSimple) => {
-              const isOnline = onlineUsers.includes(member.memberId);
+            (() => {
+              const memberList: MemberSimple[] = Array.isArray(memberData)
+                ? memberData
+                : memberData?.content || [];
 
-              return (
-                <div
-                  key={member.memberCode}
-                  onDoubleClick={() => onMemberDoubleClick(member)}
-                  className="flex items-center gap-3 p-2 hover:bg-white hover:shadow-sm rounded-md cursor-pointer transition-all select-none group"
-                >
-                  <div className="relative inline-block">
-                    <div className="bg-gray-100 p-1.5 rounded-full text-gray-600 group-hover:scale-110 transition-transform">
+              if (!memberList || memberList.length === 0) {
+                return (
+                  <div className="text-center py-2 text-xs text-gray-400">구성원이 없습니다.</div>
+                );
+              }
+
+              return memberList.map((member: MemberSimple) => {
+                const isOnline = onlineUsers.includes(member.memberId);
+
+                return (
+                  <div
+                    key={member.memberCode}
+                    onDoubleClick={() => onMemberDoubleClick(member)}
+                    className="flex items-center gap-3 p-2 hover:bg-white hover:shadow-sm rounded-md cursor-pointer transition-all select-none group"
+                  >
+                    <div className="relative inline-block">
+                      <div className="bg-gray-100 p-1.5 rounded-full text-gray-600 group-hover:scale-110 transition-transform">
+                        <User className="h-3 w-3" />
+                      </div>
+                      <span
+                        className={`absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-white transition-colors duration-300 ${
+                          isOnline ? "bg-green-500" : "bg-gray-300"
+                        }`}
+                      />
+                    </div>
+
+                    <div className="bg-green-100 p-1.5 rounded-full text-green-600 group-hover:scale-110 transition-transform">
                       <User className="h-3 w-3" />
                     </div>
-                    <span
-                      className={`absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-white transition-colors duration-300 ${
-                        isOnline ? "bg-green-500" : "bg-gray-300"
-                      }`}
-                    />
-                  </div>
-
-                  <div className="bg-green-100 p-1.5 rounded-full text-green-600 group-hover:scale-110 transition-transform">
-                    <User className="h-3 w-3" />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="font-medium text-gray-700 text-xs">
-                      {member.memberName}
-                      <span className="text-[10px] text-gray-500 ml-1">
-                        ({member.positionName})
+                    <div className="flex flex-col">
+                      <span className="font-medium text-gray-700 text-xs">
+                        {member.memberName}
+                        <span className="text-[10px] text-gray-500 ml-1">
+                          ({member.positionName})
+                        </span>
                       </span>
-                    </span>
+                    </div>
                   </div>
-                </div>
-              );
-            })
+                );
+              });
+            })()
           )}
         </div>
       )}
