@@ -4,6 +4,7 @@ import type {
   FindIdRequest,
   GetMemberListApiResponse,
   GetMyInfoApiResponse,
+  MemberResponse,
   ResetPasswordRequest,
 } from "@/types/member/member.types.ts";
 import { deeplineApi } from "@/lib/api/clients.ts";
@@ -73,8 +74,8 @@ const getMemberList = async (
   return response.data;
 };
 
-const getMembersByDept = async (deptCode: number): Promise<GetMemberListApiResponse> => {
-  const response = await deeplineApi.get<GetMemberListApiResponse>(
+const getMembersByDept = async (deptCode: number): Promise<BaseResponse<MemberResponse[]>> => {
+  const response = await deeplineApi.get<BaseResponse<MemberResponse[]>>(
     `/members/by-department/${deptCode}`
   );
   // console.log("members response:", response.data);
