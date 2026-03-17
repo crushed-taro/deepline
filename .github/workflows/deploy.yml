@@ -15,7 +15,7 @@ jobs:
 
       - name: Sync files to workspace
         run: |
-          rsync -av --exclude='.git' --exclude='application.yml' --exclude='uploads' --exclude='*.tar' ./ /docker/deepline/
+          rsync -av --exclude='.git' --exclude='application.yml' --exclude='uploads' --exclude='*.tar' --exclude='.env' ./ /docker/deepline/
 
       - name: Build and Restart Docker Containers
         run: |
