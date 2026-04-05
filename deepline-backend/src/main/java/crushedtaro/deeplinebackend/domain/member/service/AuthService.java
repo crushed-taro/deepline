@@ -19,6 +19,8 @@ import crushedtaro.deeplinebackend.domain.organization.entity.Department;
 import crushedtaro.deeplinebackend.domain.organization.entity.Position;
 import crushedtaro.deeplinebackend.domain.organization.repository.DepartmentRepository;
 import crushedtaro.deeplinebackend.domain.organization.repository.PositionRepository;
+import crushedtaro.deeplinebackend.global.exception.CustomException;
+import crushedtaro.deeplinebackend.global.exception.ErrorCode;
 import crushedtaro.deeplinebackend.infra.jwt.TokenProvider;
 
 @Service
@@ -40,7 +42,7 @@ public class AuthService {
 
     if (memberRepository.existsByMemberEmail(member.memberEmail())) {
       log.warn("[AuthService] signup() Duplicated Email Found!");
-      throw new RuntimeException("이미 존재하는 이메일입니다.");
+      throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
     }
 
     String encodedPassword = passwordEncoder.encode(member.memberPassword());
@@ -80,21 +82,21 @@ public class AuthService {
     Member registedUser =
         memberRepository
             .findByMemberId(member.memberId())
-            .orElseThrow(() -> new RuntimeException("사용자가 없습니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
     if (!memberRepository.existsByMemberId(member.memberId())) {
       log.warn("[AuthService] Login() Required User Not Found!");
-      throw new RuntimeException("User Not Found");
+      throw new CustomException(ErrorCode.MEMBER_NOT_FOUND);
     }
 
     if ("Y".equals(registedUser.getIsDeleted())) {
       log.warn("[AuthService] Login() Deleted User Attempted Login!");
-      throw new RuntimeException("Deleted User Cannot Login");
+      throw new CustomException(ErrorCode.WITHDRAWN_MEMBER);
     }
 
     if (!passwordEncoder.matches(member.memberPassword(), registedUser.getMemberPassword())) {
       log.warn("[AuthService] Login() Password Match Failed!");
-      throw new RuntimeException("Password Match Failed");
+      throw new CustomException(ErrorCode.INVALID_PASSWORD);
     }
 
     TokenDTO newTokenDTO = tokenProvider.generateTokenDTO(registedUser);
