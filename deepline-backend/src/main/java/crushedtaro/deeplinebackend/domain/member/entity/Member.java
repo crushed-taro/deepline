@@ -10,6 +10,8 @@ import lombok.*;
 import crushedtaro.deeplinebackend.domain.common.BaseEntity;
 import crushedtaro.deeplinebackend.domain.organization.entity.Department;
 import crushedtaro.deeplinebackend.domain.organization.entity.Position;
+import crushedtaro.deeplinebackend.global.exception.CustomException;
+import crushedtaro.deeplinebackend.global.exception.ErrorCode;
 
 @Entity
 @Table(name = "tbl_member")
@@ -64,7 +66,7 @@ public class Member extends BaseEntity {
 
   public void useVacation(double days) {
     if (this.remainVacation < days) {
-      throw new RuntimeException("잔여 휴가 일수가 부족합니다. (잔여: " + this.remainVacation + ")");
+      throw new CustomException(ErrorCode.INSUFFICIENT_VACATION_DAYS);
     }
     this.remainVacation -= days;
   }

@@ -23,6 +23,8 @@ import crushedtaro.deeplinebackend.domain.audit.annotation.AuditLog;
 import crushedtaro.deeplinebackend.domain.member.entity.Member;
 import crushedtaro.deeplinebackend.domain.member.repository.MemberRepository;
 import crushedtaro.deeplinebackend.domain.notification.service.NotificationProducer;
+import crushedtaro.deeplinebackend.global.exception.CustomException;
+import crushedtaro.deeplinebackend.global.exception.ErrorCode;
 
 @Service
 @Slf4j
@@ -44,14 +46,14 @@ public class ApprovalService {
     Member member =
         memberRepository
             .findByMemberId(memberId)
-            .orElseThrow(() -> new RuntimeException("회원 정보가 없습니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
     ApprovalType type = ApprovalType.GENERAL;
     if (approvalRegistDTO.type() != null) {
       try {
         type = ApprovalType.valueOf(approvalRegistDTO.type());
       } catch (IllegalArgumentException e) {
-        throw new RuntimeException("유효하지 않은 결재 유형입니다.");
+        throw new CustomException(ErrorCode.INVALID_APPROVAL_TYPE);
       }
     }
 
@@ -69,7 +71,7 @@ public class ApprovalService {
     List<Integer> approverCodes = approvalRegistDTO.approverCodes();
 
     if (approverCodes == null || approverCodes.isEmpty()) {
-      throw new RuntimeException("최소 1명 이상의 결재자를 지정해야 합니다.");
+      throw new CustomException(ErrorCode.APPROVER_REQUIRED);
     }
 
     for (int i = 0; i < approverCodes.size(); i++) {
@@ -79,10 +81,10 @@ public class ApprovalService {
       Member approver =
           memberRepository
               .findById(approverCode)
-              .orElseThrow(() -> new RuntimeException("결재자 정보가 없습니다."));
+              .orElseThrow(() -> new CustomException(ErrorCode.APPROVER_NOT_FOUND));
 
       if (approver.getMemberCode() == member.getMemberCode()) {
-        throw new RuntimeException("본인은 결재자로 지정할 수 없습니다.");
+        throw new CustomException(ErrorCode.CANNOT_APPROVE_SELF);
       }
 
       ApprovalStatus lineStatus = (i == 0) ? ApprovalStatus.PENDING : ApprovalStatus.WAITING;
@@ -123,7 +125,7 @@ public class ApprovalService {
     Member member =
         memberRepository
             .findByMemberId(memberId)
-            .orElseThrow(() -> new RuntimeException("회원 정보가 없습니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
     return approvalRepository.findAllByMemberOrderByCreatedAtDesc(member).stream()
         .map(
@@ -145,7 +147,7 @@ public class ApprovalService {
     Member member =
         memberRepository
             .findByMemberId(memberId)
-            .orElseThrow(() -> new RuntimeException("회원 정보가 없습니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
     return approvalRepository.findWaitApprovals(member.getMemberCode()).stream()
         .map(
@@ -166,7 +168,7 @@ public class ApprovalService {
     Approval approval =
         approvalRepository
             .findById(approvalCode)
-            .orElseThrow(() -> new RuntimeException("해당 결재 문서가 존재하지 않습니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.APPROVAL_NOT_FOUND));
 
     List<ApprovalLineDTO> approvalLineDTOS =
         approval.getApprovalLines().stream()
@@ -208,21 +210,21 @@ public class ApprovalService {
     Member approver =
         memberRepository
             .findByMemberId(memberId)
-            .orElseThrow(() -> new RuntimeException("회원 정보가 없습니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
     Approval approval =
         approvalRepository
             .findById(approvalCode)
-            .orElseThrow(() -> new RuntimeException("존재하지 않는 결재 문서입니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.APPROVAL_NOT_FOUND));
 
     ApprovalLine myLine =
         approval.getApprovalLines().stream()
             .filter(line -> line.getApprover().getMemberCode() == approver.getMemberCode())
             .findFirst()
-            .orElseThrow(() -> new RuntimeException("결재 권한이 없습니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED_APPROVAL));
 
     if (myLine.getStatus() != ApprovalStatus.PENDING) {
-      throw new RuntimeException("현재 결재할 수 있는 상태가 아닙니다.");
+      throw new CustomException(ErrorCode.INVALID_APPROVAL_STATE);
     }
 
     myLine.processApproval(approvalProcessDTO.status(), approvalProcessDTO.comments());

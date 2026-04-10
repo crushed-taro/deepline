@@ -27,6 +27,8 @@ import crushedtaro.deeplinebackend.domain.organization.entity.Department;
 import crushedtaro.deeplinebackend.domain.organization.entity.Position;
 import crushedtaro.deeplinebackend.domain.organization.repository.DepartmentRepository;
 import crushedtaro.deeplinebackend.domain.organization.repository.PositionRepository;
+import crushedtaro.deeplinebackend.global.exception.CustomException;
+import crushedtaro.deeplinebackend.global.exception.ErrorCode;
 
 @Service
 @Slf4j
@@ -46,7 +48,7 @@ public class MemberService {
     Member member =
         memberRepository
             .findByMemberNameAndMemberEmail(findIdDTO.memberName(), findIdDTO.memberEmail())
-            .orElseThrow(() -> new RuntimeException("일치하는 회원 정보가 없습니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
     log.info("[MemberService] findMemberid() END");
 
@@ -63,7 +65,7 @@ public class MemberService {
                 resetPasswordDTO.memberId(),
                 resetPasswordDTO.memberName(),
                 resetPasswordDTO.memberEmail())
-            .orElseThrow(() -> new RuntimeException("일치하는 회원 정보가 없습니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
     if (!resetPasswordDTO.isPasswordMatched()) {
       throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
@@ -85,7 +87,7 @@ public class MemberService {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
     if (authentication == null || authentication.getName() == null) {
-      throw new RuntimeException("인증 정보가 없습니다.");
+      throw new CustomException(ErrorCode.UNAUTHORIZED_USER);
     }
 
     String memberId = authentication.getName();
@@ -94,7 +96,7 @@ public class MemberService {
     Member member =
         memberRepository
             .findByMemberId(memberId)
-            .orElseThrow(() -> new RuntimeException("로그인 유저 정보를 찾을 수 없습니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
     String deptName =
         (member.getDepartment() != null) ? member.getDepartment().getDeptName() : "소속 없음";
@@ -127,7 +129,7 @@ public class MemberService {
     Member member =
         memberRepository
             .findByMemberId(memberId)
-            .orElseThrow(() -> new RuntimeException("로그인 유저 정보를 찾을 수 없습니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
     member.withdraw();
 
@@ -142,12 +144,12 @@ public class MemberService {
     Member member =
         memberRepository
             .findByMemberId(memberId)
-            .orElseThrow(() -> new RuntimeException("로그인 유저 정보를 찾을 수 없습니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
     String newEmail = updateMemberDTO.memberEmail();
     if (newEmail != null && !newEmail.equals(member.getMemberEmail())) {
       if (memberRepository.existsByMemberEmail(newEmail)) {
-        throw new RuntimeException("이미 사용 중인 이메일입니다.");
+        throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
       }
     }
 
@@ -187,7 +189,7 @@ public class MemberService {
         }
 
       } catch (IOException e) {
-        throw new RuntimeException("프로필 이미지 저장 중 오류가 발생했습니다.", e);
+        throw new CustomException(ErrorCode.PROFILE_IMAGE_SAVE_ERROR);
       }
     }
 
@@ -201,17 +203,17 @@ public class MemberService {
     Member member =
         memberRepository
             .findByMemberId(memberId)
-            .orElseThrow(() -> new RuntimeException("해당 회원을 찾을 수 없습니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
     Department department =
         departmentRepository
             .findById(memberAssignmentDTO.deptCode())
-            .orElseThrow(() -> new RuntimeException("존재하지 않는 부서입니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.DEPARTMENT_NOT_FOUND));
 
     Position position =
         positionRepository
             .findById(memberAssignmentDTO.positionCode())
-            .orElseThrow(() -> new RuntimeException("존재하지 않는 직급입니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.POSITION_NOT_FOUND));
 
     member.assignDepartment(department);
     member.assignPosition(position);

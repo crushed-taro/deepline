@@ -15,6 +15,8 @@ import crushedtaro.deeplinebackend.domain.notice.dto.NoticeRequestDTO;
 import crushedtaro.deeplinebackend.domain.notice.dto.NoticeResponseDTO;
 import crushedtaro.deeplinebackend.domain.notice.entity.Notice;
 import crushedtaro.deeplinebackend.domain.notice.repository.NoticeRepository;
+import crushedtaro.deeplinebackend.global.exception.CustomException;
+import crushedtaro.deeplinebackend.global.exception.ErrorCode;
 
 @Transactional
 @Service
@@ -33,7 +35,7 @@ public class NoticeService {
     Member author =
         memberRepository
             .findByMemberId(memberId)
-            .orElseThrow(() -> new RuntimeException("회원 정보가 없습니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
     Notice notice =
         Notice.builder()
@@ -57,7 +59,7 @@ public class NoticeService {
     Notice notice =
         noticeRepository
             .findById(noticeCode)
-            .orElseThrow(() -> new RuntimeException("공지사항을 찾을 수 없습니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.NOTICE_NOT_FOUND));
     notice.incrementViewCount();
     return NoticeResponseDTO.from(notice);
   }
@@ -68,7 +70,7 @@ public class NoticeService {
     Notice notice =
         noticeRepository
             .findById(noticeCode)
-            .orElseThrow(() -> new RuntimeException("공지사항을 찾을 수 없습니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.NOTICE_NOT_FOUND));
 
     notice.withdraw();
     log.info("[NoticeService] deleteNotice() END");

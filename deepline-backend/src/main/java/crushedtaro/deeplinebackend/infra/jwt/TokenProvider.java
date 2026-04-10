@@ -29,6 +29,8 @@ import crushedtaro.deeplinebackend.domain.member.dto.TokenDTO;
 import crushedtaro.deeplinebackend.domain.member.entity.Member;
 import crushedtaro.deeplinebackend.domain.member.entity.MemberRole;
 import crushedtaro.deeplinebackend.domain.member.enums.TokenStatus;
+import crushedtaro.deeplinebackend.global.exception.CustomException;
+import crushedtaro.deeplinebackend.global.exception.ErrorCode;
 
 @Component
 @Slf4j
@@ -111,7 +113,7 @@ public class TokenProvider {
     Claims claims = parseClaims(token);
 
     if (claims.get(AUTHORITIES_KET) == null) {
-      throw new RuntimeException("Token has no authorities");
+      throw new CustomException(ErrorCode.TOKEN_WITHOUT_AUTHORITY);
     }
 
     Collection<? extends GrantedAuthority> authorities =

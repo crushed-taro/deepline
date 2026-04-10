@@ -21,6 +21,8 @@ import crushedtaro.deeplinebackend.domain.attendance.enums.AttendanceStatus;
 import crushedtaro.deeplinebackend.domain.attendance.repository.AttendanceRepository;
 import crushedtaro.deeplinebackend.domain.member.entity.Member;
 import crushedtaro.deeplinebackend.domain.member.repository.MemberRepository;
+import crushedtaro.deeplinebackend.global.exception.CustomException;
+import crushedtaro.deeplinebackend.global.exception.ErrorCode;
 
 @Service
 @Slf4j
@@ -38,12 +40,12 @@ public class AttendanceService {
     Member member =
         memberRepository
             .findByMemberId(memberId)
-            .orElseThrow(() -> new RuntimeException("회원 정보가 없습니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
     LocalDate today = LocalDate.now();
 
     if (attendanceRepository.existsByMemberAndWorkDate(member, today)) {
-      throw new RuntimeException("이미 출근 처리가 되었습니다");
+      throw new CustomException(ErrorCode.ALREADY_ATTENDED);
     }
 
     LocalDateTime now = LocalDateTime.now();
@@ -69,14 +71,14 @@ public class AttendanceService {
     Member member =
         memberRepository
             .findByMemberId(memberId)
-            .orElseThrow(() -> new RuntimeException("회원 정보가 없습니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
     LocalDate today = LocalDate.now();
 
     Attendance attendance =
         attendanceRepository
             .findByMemberAndWorkDate(member, today)
-            .orElseThrow(() -> new RuntimeException("출근 기록이 없습니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.ATTENDANCE_NOT_FOUND));
 
     attendance.clockOut(LocalDateTime.now());
 
@@ -92,7 +94,7 @@ public class AttendanceService {
     Member member =
         memberRepository
             .findByMemberId(memberId)
-            .orElseThrow(() -> new RuntimeException("회원 정보가 없습니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
     YearMonth yearMonth = YearMonth.of(year, month);
     LocalDate startDate = yearMonth.atDay(1);

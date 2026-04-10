@@ -17,6 +17,8 @@ import crushedtaro.deeplinebackend.domain.member.repository.MemberRepository;
 import crushedtaro.deeplinebackend.domain.notification.dto.NotificationMessage;
 import crushedtaro.deeplinebackend.domain.notification.entity.Notification;
 import crushedtaro.deeplinebackend.domain.notification.repository.NotificationRepository;
+import crushedtaro.deeplinebackend.global.exception.CustomException;
+import crushedtaro.deeplinebackend.global.exception.ErrorCode;
 
 @Service
 @RequiredArgsConstructor
@@ -66,7 +68,7 @@ public class NotificationService {
     Member receiver =
         memberRepository
             .findByMemberId(message.receiverId())
-            .orElseThrow(() -> new RuntimeException("회원 없음"));
+            .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
     Notification notification =
         Notification.builder()

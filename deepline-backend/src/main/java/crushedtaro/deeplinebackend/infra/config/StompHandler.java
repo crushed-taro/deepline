@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import crushedtaro.deeplinebackend.global.exception.CustomException;
+import crushedtaro.deeplinebackend.global.exception.ErrorCode;
 import crushedtaro.deeplinebackend.infra.jwt.TokenProvider;
 
 @Slf4j
@@ -32,7 +34,7 @@ public class StompHandler implements ChannelInterceptor {
 
       if (!tokenProvider.validateToken(jwt)) {
         log.error("WebSocket 토큰 검증 실패");
-        throw new RuntimeException("인증 오류");
+        throw new CustomException(ErrorCode.WEBSOCKET_AUTH_ERROR);
       }
 
       String userId = tokenProvider.getUserId(jwt);

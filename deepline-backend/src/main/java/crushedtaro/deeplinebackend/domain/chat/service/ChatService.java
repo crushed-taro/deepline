@@ -17,6 +17,8 @@ import crushedtaro.deeplinebackend.domain.chat.repository.ChatMessageRepository;
 import crushedtaro.deeplinebackend.domain.chat.repository.ChatRoomRepository;
 import crushedtaro.deeplinebackend.domain.member.entity.Member;
 import crushedtaro.deeplinebackend.domain.member.repository.MemberRepository;
+import crushedtaro.deeplinebackend.global.exception.CustomException;
+import crushedtaro.deeplinebackend.global.exception.ErrorCode;
 
 @Service
 @RequiredArgsConstructor
@@ -32,12 +34,12 @@ public class ChatService {
     ChatRoom room =
         chatRoomRepository
             .findByRoomId(chatDTO.roomId())
-            .orElseThrow(() -> new RuntimeException("채팅방을 찾을 수 없습니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_NOT_FOUND));
 
     Member sender =
         memberRepository
             .findByMemberId(chatDTO.senderId())
-            .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
     ChatMessage chatMessage =
         ChatMessage.builder().chatRoom(room).sender(sender).message(chatDTO.message()).build();
@@ -57,11 +59,11 @@ public class ChatService {
     Member sender =
         memberRepository
             .findByMemberId(senderId)
-            .orElseThrow(() -> new RuntimeException("발신자 정보가 없습니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.SENDER_NOT_FOUND));
     Member receiver =
         memberRepository
             .findByMemberId(receiverId)
-            .orElseThrow(() -> new RuntimeException("수신자 정보가 없습니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.RECEIVER_NOT_FOUND));
 
     String roomId =
         (senderId.compareTo(receiverId) < 0)
@@ -95,7 +97,7 @@ public class ChatService {
     ChatRoom room =
         chatRoomRepository
             .findByChatRoomCode(roomId)
-            .orElseThrow(() -> new RuntimeException("채팅방을 찾을 수 없습니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_NOT_FOUND));
 
     return chatMessageRepository.findAllByChatRoomOrderByCreatedAtAsc(room).stream()
         .map(
