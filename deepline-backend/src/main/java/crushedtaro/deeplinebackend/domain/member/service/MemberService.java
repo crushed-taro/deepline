@@ -68,7 +68,7 @@ public class MemberService {
             .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
     if (!resetPasswordDTO.isPasswordMatched()) {
-      throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+      throw new CustomException(ErrorCode.INVALID_PASSWORD);
     }
 
     String encodedPassword = passwordEncoder.encode(resetPasswordDTO.newPassword());
@@ -84,19 +84,11 @@ public class MemberService {
   public MemberResponseDTO getMyInfo() {
     log.info("[MemberService] getMyInfo() START");
 
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String memberId = getCurrentMemberId();
 
-    if (authentication == null || authentication.getName() == null) {
-      throw new CustomException(ErrorCode.UNAUTHORIZED_USER);
-    }
-
-    String memberId = authentication.getName();
     log.info("[MemberService] Current User ID : {}", memberId);
 
-    Member member =
-        memberRepository
-            .findByMemberId(memberId)
-            .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+    Member member = findMemberById(memberId);
 
     String deptName =
         (member.getDepartment() != null) ? member.getDepartment().getDeptName() : "소속 없음";
@@ -122,14 +114,11 @@ public class MemberService {
   public void withdraw() {
     log.info("[MemberService] withdraw() START");
 
-    String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
+    String memberId = getCurrentMemberId();
 
     log.info("[MemberService] Current User ID : {}", memberId);
 
-    Member member =
-        memberRepository
-            .findByMemberId(memberId)
-            .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+    Member member = findMemberById(memberId);
 
     member.withdraw();
 
@@ -140,11 +129,8 @@ public class MemberService {
   public void updateMyInfo(UpdateMemberDTO updateMemberDTO, MultipartFile imageFile) {
     log.info("[MemberService] updateMyInfo() START");
 
-    String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
-    Member member =
-        memberRepository
-            .findByMemberId(memberId)
-            .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+    String memberId = getCurrentMemberId();
+    Member member = findMemberById(memberId);
 
     String newEmail = updateMemberDTO.memberEmail();
     if (newEmail != null && !newEmail.equals(member.getMemberEmail())) {
@@ -200,10 +186,7 @@ public class MemberService {
   public void assignMember(String memberId, MemberAssignmentDTO memberAssignmentDTO) {
     log.info("[MemberService] assignMember() START");
 
-    Member member =
-        memberRepository
-            .findByMemberId(memberId)
-            .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+    Member member = findMemberById(memberId);
 
     Department department =
         departmentRepository
@@ -263,5 +246,20 @@ public class MemberService {
     return memberRepository.findAllByDepartment_DeptCode(departmentCode).stream()
         .map(MemberResponseDTO::from)
         .collect(Collectors.toList());
+  }
+
+  private Member findMemberById(String memberId) {
+    return memberRepository
+        .findByMemberId(memberId)
+        .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+  }
+
+  private String getCurrentMemberId() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+    if (authentication == null || authentication.getName() == null) {
+      throw new CustomException(ErrorCode.UNAUTHORIZED_USER);
+    }
+    return authentication.getName();
   }
 }
