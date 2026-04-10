@@ -103,6 +103,19 @@ services:
     networks:
       - app-network
 
+  redis:
+    image: redis:7-alpine
+    container_name: deepline-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    environment:
+      TZ: Asia/Seoul
+    volumes:
+      - /data/redis/data:/data
+    networks:
+      - app-network
+
 volumes:
   postgres-data:
 
