@@ -14,11 +14,13 @@ import lombok.extern.slf4j.Slf4j;
 
 import crushedtaro.deeplinebackend.domain.common.BaseResponse;
 import crushedtaro.deeplinebackend.domain.common.BaseResponseFactory;
+import crushedtaro.deeplinebackend.domain.organization.dto.DepartmentDTO;
 import crushedtaro.deeplinebackend.domain.organization.entity.Department;
 import crushedtaro.deeplinebackend.domain.organization.entity.Position;
 import crushedtaro.deeplinebackend.domain.organization.enums.OrganizationStatus;
 import crushedtaro.deeplinebackend.domain.organization.repository.DepartmentRepository;
 import crushedtaro.deeplinebackend.domain.organization.repository.PositionRepository;
+import crushedtaro.deeplinebackend.domain.organization.service.OrganizationService;
 
 @RestController
 @RequestMapping("/api/v1/organizations")
@@ -28,14 +30,15 @@ import crushedtaro.deeplinebackend.domain.organization.repository.PositionReposi
 @Tag(name = "Organization API", description = "부서 및 직급 관리 (관리자 전용)")
 public class OrganizationController {
 
+  private final OrganizationService organizationService;
   private final DepartmentRepository departmentRepository;
   private final PositionRepository positionRepository;
 
   @GetMapping("/departments")
   @Operation(summary = "부서 목록 조회", description = "전체 부서 목록을 조회합니다.")
-  public ResponseEntity<BaseResponse<List<Department>>> getDepartments() {
+  public ResponseEntity<BaseResponse<List<DepartmentDTO>>> getDepartments() {
     return BaseResponseFactory.success(
-        OrganizationStatus.READ_DEPARTMENT_SUCCESS, departmentRepository.findAll());
+        OrganizationStatus.READ_DEPARTMENT_SUCCESS, organizationService.getAllDepartments());
   }
 
   @PostMapping("/departments")

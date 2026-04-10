@@ -12,9 +12,11 @@ import crushedtaro.deeplinebackend.domain.member.dto.SignupResponseDTO;
 import crushedtaro.deeplinebackend.domain.member.dto.TokenDTO;
 import crushedtaro.deeplinebackend.domain.member.entity.Member;
 import crushedtaro.deeplinebackend.domain.member.entity.MemberRole;
+import crushedtaro.deeplinebackend.domain.member.entity.RefreshToken;
 import crushedtaro.deeplinebackend.domain.member.enums.SignupStatus;
 import crushedtaro.deeplinebackend.domain.member.repository.MemberRepository;
 import crushedtaro.deeplinebackend.domain.member.repository.MemberRoleRepository;
+import crushedtaro.deeplinebackend.domain.member.repository.RefreshTokenRepository;
 import crushedtaro.deeplinebackend.domain.organization.entity.Department;
 import crushedtaro.deeplinebackend.domain.organization.entity.Position;
 import crushedtaro.deeplinebackend.domain.organization.repository.DepartmentRepository;
@@ -34,6 +36,7 @@ public class AuthService {
   private final TokenProvider tokenProvider;
   private final DepartmentRepository departmentRepository;
   private final PositionRepository positionRepository;
+  private final RefreshTokenRepository refreshTokenRepository;
 
   @Transactional
   public SignupResponseDTO signup(MemberDTO member) {
@@ -100,6 +103,14 @@ public class AuthService {
     }
 
     TokenDTO newTokenDTO = tokenProvider.generateTokenDTO(registedUser);
+
+    RefreshToken refreshToken =
+        RefreshToken.builder()
+            .key(registedUser.getMemberId())
+            .value(newTokenDTO.refreshToken())
+            .build();
+
+    refreshTokenRepository.save(refreshToken);
 
     return newTokenDTO;
   }

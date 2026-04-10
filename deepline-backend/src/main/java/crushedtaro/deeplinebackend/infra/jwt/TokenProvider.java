@@ -38,6 +38,7 @@ public class TokenProvider {
   private static final String AUTHORITIES_KET = "auth";
   private static final String BEARER_TYPE = "bearer";
   private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30;
+  private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;
 
   private final UserDetailsService userDetailsService;
 
@@ -76,12 +77,19 @@ public class TokenProvider {
             .signWith(key, SignatureAlgorithm.HS512)
             .compact();
 
+    String refreshToken =
+        Jwts.builder()
+            .setExpiration(new Date(now + REFRESH_TOKEN_EXPIRE_TIME))
+            .signWith(key, SignatureAlgorithm.HS512)
+            .compact();
+
     log.info("[TokenProvider] generateTokenDTO() End");
 
     return new TokenDTO(
         BEARER_TYPE,
         member.getMemberName(),
         accessToken,
+        refreshToken,
         accessTokenExpiresIn.getTime(),
         TokenStatus.LOGIN_SUCCESS);
   }
