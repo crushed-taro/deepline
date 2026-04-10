@@ -46,13 +46,14 @@ public class OrganizationController {
   public ResponseEntity<BaseResponse<Department>> createDepartment(
       @RequestBody Department department) {
     return BaseResponseFactory.success(
-        OrganizationStatus.CREATE_DEPARTMENT_SUCCESS, departmentRepository.save(department));
+        OrganizationStatus.CREATE_DEPARTMENT_SUCCESS,
+        organizationService.createDepartment(department));
   }
 
   @DeleteMapping("/departments/{id}")
   @Operation(summary = "부서 삭제", description = "특정 부서를 삭제합니다.")
   public ResponseEntity<BaseResponse<Void>> deleteDepartment(@PathVariable Long id) {
-    departmentRepository.deleteById(Math.toIntExact(id));
+    organizationService.deleteDepartment(id);
     return BaseResponseFactory.success(OrganizationStatus.DELETE_DEPARTMENT_SUCCESS);
   }
 
