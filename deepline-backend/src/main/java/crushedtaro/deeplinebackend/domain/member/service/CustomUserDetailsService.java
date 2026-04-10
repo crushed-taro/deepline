@@ -8,7 +8,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +20,8 @@ import crushedtaro.deeplinebackend.domain.member.dto.MemberRoleDTO;
 import crushedtaro.deeplinebackend.domain.member.entity.Member;
 import crushedtaro.deeplinebackend.domain.member.entity.MemberRole;
 import crushedtaro.deeplinebackend.domain.member.repository.MemberRepository;
+import crushedtaro.deeplinebackend.global.exception.CustomException;
+import crushedtaro.deeplinebackend.global.exception.ErrorCode;
 
 @Service
 @AllArgsConstructor
@@ -31,16 +32,16 @@ public class CustomUserDetailsService implements UserDetailsService {
 
   @Transactional
   @Override
-  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+  public UserDetails loadUserByUsername(String username) {
     log.info("[CustomUserDetailsService] loadUserByUsername -> username: {}", username);
 
     Member memberEntity =
         memberRepository
             .findByMemberId(username)
-            .orElseThrow(() -> new RuntimeException("로그인 유저 정보를 찾을 수 없습니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
     if ("Y".equals(memberEntity.getIsDeleted())) {
-      throw new UsernameNotFoundException("탈퇴한 회원입니다.");
+      throw new CustomException(ErrorCode.WITHDRAWN_MEMBER);
     }
 
     List<GrantedAuthority> authorities = new ArrayList<>();

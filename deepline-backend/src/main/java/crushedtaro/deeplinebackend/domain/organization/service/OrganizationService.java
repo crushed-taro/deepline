@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import crushedtaro.deeplinebackend.domain.organization.dto.DepartmentDTO;
 import crushedtaro.deeplinebackend.domain.organization.entity.Department;
 import crushedtaro.deeplinebackend.domain.organization.repository.DepartmentRepository;
+import crushedtaro.deeplinebackend.global.exception.CustomException;
+import crushedtaro.deeplinebackend.global.exception.ErrorCode;
 
 @Service
 @RequiredArgsConstructor
@@ -43,6 +45,11 @@ public class OrganizationService {
   @Transactional
   @CacheEvict(value = "departments", key = "'all'")
   public void deleteDepartment(Long id) {
+
+    departmentRepository
+        .findById(Math.toIntExact(id))
+        .orElseThrow(() -> new CustomException(ErrorCode.DEPARTMENT_NOT_FOUND));
+
     log.info("[Cache Evict] 부서가 삭제되어 기존 부서 캐시를 초기화합니다.");
     departmentRepository.deleteById(Math.toIntExact(id));
   }
