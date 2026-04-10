@@ -56,10 +56,8 @@ public class NoticeService {
   }
 
   public NoticeResponseDTO getNoticeDetail(Long noticeCode) {
-    Notice notice =
-        noticeRepository
-            .findById(noticeCode)
-            .orElseThrow(() -> new CustomException(ErrorCode.NOTICE_NOT_FOUND));
+    Notice notice = findNoticeById(noticeCode);
+
     notice.incrementViewCount();
     return NoticeResponseDTO.from(notice);
   }
@@ -67,12 +65,15 @@ public class NoticeService {
   public void deleteNotice(Long noticeCode) {
     log.info("[NoticeService] deleteNotice() START");
 
-    Notice notice =
-        noticeRepository
-            .findById(noticeCode)
-            .orElseThrow(() -> new CustomException(ErrorCode.NOTICE_NOT_FOUND));
+    Notice notice = findNoticeById(noticeCode);
 
     notice.withdraw();
     log.info("[NoticeService] deleteNotice() END");
+  }
+
+  private Notice findNoticeById(Long noticeCode) {
+    return noticeRepository
+        .findById(noticeCode)
+        .orElseThrow(() -> new CustomException(ErrorCode.NOTICE_NOT_FOUND));
   }
 }
