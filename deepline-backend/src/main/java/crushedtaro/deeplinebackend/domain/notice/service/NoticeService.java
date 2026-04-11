@@ -62,7 +62,7 @@ public class NoticeService {
     return NoticeResponseDTO.from(notice);
   }
 
-  @AuditLog(actionType = "DELETE", targetName = "NOTICE")
+  @AuditLog(actionType = "DELETE", targetName = "NOTICE", key = "#noticeCode")
   public void deleteNotice(Long noticeCode) {
     log.info("[NoticeService] deleteNotice() START");
 

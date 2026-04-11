@@ -194,7 +194,7 @@ public class ApprovalService {
         approvalLineDTOS);
   }
 
-  @AuditLog(actionType = "PROCESS", targetName = "APPROVAL")
+  @AuditLog(actionType = "PROCESS", targetName = "APPROVAL", key = "@approvalCode")
   @Transactional
   public void processApproval(Long approvalCode, ApprovalProcessDTO approvalProcessDTO) {
     log.info("[ApprovalService] processApproval Start");

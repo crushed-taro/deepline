@@ -11,4 +11,6 @@ public @interface AuditLog {
   String actionType();
 
   String targetName();
+
+  String key() default "";
 }

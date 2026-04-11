@@ -56,7 +56,10 @@ public class MemberService {
     return member.getMemberId();
   }
 
-  @AuditLog(actionType = "UPDATE_PASSWORD", targetName = "MEMBER")
+  @AuditLog(
+      actionType = "UPDATE_PASSWORD",
+      targetName = "MEMBER",
+      key = "#resetPasswordDTO.memberId")
   @Transactional
   public String resetPassword(ResetPasswordDTO resetPasswordDTO) {
     log.info("[MemberService] resetPassword() START");
@@ -185,7 +188,7 @@ public class MemberService {
     log.info("[MemberService] updateMyInfo() END");
   }
 
-  @AuditLog(actionType = "ASSIGN_ROLE", targetName = "MEMBER")
+  @AuditLog(actionType = "ASSIGN_ROLE", targetName = "MEMBER", key = "#memberId")
   @Transactional
   public void assignMember(String memberId, MemberAssignmentDTO memberAssignmentDTO) {
     log.info("[MemberService] assignMember() START");
