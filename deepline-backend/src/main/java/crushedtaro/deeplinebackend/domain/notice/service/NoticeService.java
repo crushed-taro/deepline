@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import crushedtaro.deeplinebackend.domain.audit.annotation.AuditLog;
 import crushedtaro.deeplinebackend.domain.member.entity.Member;
 import crushedtaro.deeplinebackend.domain.member.repository.MemberRepository;
 import crushedtaro.deeplinebackend.domain.notice.dto.NoticeRequestDTO;
@@ -28,6 +29,7 @@ public class NoticeService {
   private final MemberRepository memberRepository;
   private final SecurityUtil securityUtil;
 
+  @AuditLog(actionType = "CREATE", targetName = "NOTICE")
   public void createNotice(NoticeRequestDTO noticeRequestDTO) {
     log.info("[NoticeService] createNotice() START");
 
@@ -60,6 +62,7 @@ public class NoticeService {
     return NoticeResponseDTO.from(notice);
   }
 
+  @AuditLog(actionType = "DELETE", targetName = "NOTICE")
   public void deleteNotice(Long noticeCode) {
     log.info("[NoticeService] deleteNotice() START");
 

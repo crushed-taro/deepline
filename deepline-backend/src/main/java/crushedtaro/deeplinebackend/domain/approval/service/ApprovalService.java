@@ -38,16 +38,14 @@ public class ApprovalService {
   private final AttendanceService attendanceService;
   private final NotificationProducer notificationProducer;
 
+  @AuditLog(actionType = "CREATE", targetName = "APPROVAL")
   @Transactional
   public void registerApproval(ApprovalRegistDTO approvalRegistDTO) {
     log.info("[ApprovalService] registerApproval Start");
 
     String memberId = securityUtil.getCurrentMemberId();
 
-    Member member =
-        memberRepository
-            .findByMemberId(memberId)
-            .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+    Member member = securityUtil.findMemberById(memberId);
 
     ApprovalType type = ApprovalType.GENERAL;
     if (approvalRegistDTO.type() != null) {

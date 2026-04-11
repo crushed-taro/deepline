@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import crushedtaro.deeplinebackend.domain.audit.annotation.AuditLog;
 import crushedtaro.deeplinebackend.domain.member.dto.*;
 import crushedtaro.deeplinebackend.domain.member.entity.Member;
 import crushedtaro.deeplinebackend.domain.member.repository.MemberRepository;
@@ -55,6 +56,7 @@ public class MemberService {
     return member.getMemberId();
   }
 
+  @AuditLog(actionType = "UPDATE_PASSWORD", targetName = "MEMBER")
   @Transactional
   public String resetPassword(ResetPasswordDTO resetPasswordDTO) {
     log.info("[MemberService] resetPassword() START");
@@ -110,6 +112,7 @@ public class MemberService {
         member.getProfileUrl());
   }
 
+  @AuditLog(actionType = "DELETE", targetName = "MEMBER")
   @Transactional
   public void withdraw() {
     log.info("[MemberService] withdraw() START");
@@ -182,6 +185,7 @@ public class MemberService {
     log.info("[MemberService] updateMyInfo() END");
   }
 
+  @AuditLog(actionType = "ASSIGN_ROLE", targetName = "MEMBER")
   @Transactional
   public void assignMember(String memberId, MemberAssignmentDTO memberAssignmentDTO) {
     log.info("[MemberService] assignMember() START");
