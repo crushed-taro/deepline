@@ -123,10 +123,7 @@ public class ApprovalService {
     log.info("[ApprovalService] getSentApprovals Start");
     String memberId = securityUtil.getCurrentMemberId();
 
-    Member member =
-        memberRepository
-            .findByMemberId(memberId)
-            .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+    Member member = securityUtil.findMemberById(memberId);
 
     return approvalRepository.findAllByMemberOrderByCreatedAtDesc(member).stream()
         .map(
@@ -165,7 +162,7 @@ public class ApprovalService {
 
     Approval approval =
         approvalRepository
-            .findById(approvalCode)
+            .findDetailByApprovalCode(approvalCode)
             .orElseThrow(() -> new CustomException(ErrorCode.APPROVAL_NOT_FOUND));
 
     List<ApprovalLineDTO> approvalLineDTOS =
@@ -210,7 +207,7 @@ public class ApprovalService {
 
     Approval approval =
         approvalRepository
-            .findById(approvalCode)
+            .findDetailByApprovalCode(approvalCode)
             .orElseThrow(() -> new CustomException(ErrorCode.APPROVAL_NOT_FOUND));
 
     ApprovalLine myLine =
