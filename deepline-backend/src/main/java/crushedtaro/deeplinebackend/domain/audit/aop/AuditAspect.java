@@ -4,7 +4,6 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
@@ -13,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import crushedtaro.deeplinebackend.domain.audit.annotation.AuditLog;
 import crushedtaro.deeplinebackend.domain.audit.entity.Audit;
 import crushedtaro.deeplinebackend.domain.audit.repository.AuditLogRepository;
+import crushedtaro.deeplinebackend.global.util.SecurityUtil;
 
 @Aspect
 @Component
@@ -20,6 +20,7 @@ import crushedtaro.deeplinebackend.domain.audit.repository.AuditLogRepository;
 @Slf4j
 public class AuditAspect {
 
+  private final SecurityUtil securityUtil;
   private final AuditLogRepository auditLogRepository;
 
   @Around("@annotation(auditAnnotation)")
@@ -29,7 +30,7 @@ public class AuditAspect {
     Object result = pjp.proceed();
 
     try {
-      String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
+      String memberId = securityUtil.getCurrentMemberId();
       String targetId = "UNKNOWN";
 
       for (Object arg : pjp.getArgs()) {

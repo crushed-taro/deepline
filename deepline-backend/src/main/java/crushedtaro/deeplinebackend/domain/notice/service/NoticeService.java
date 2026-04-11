@@ -2,7 +2,6 @@ package crushedtaro.deeplinebackend.domain.notice.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +16,7 @@ import crushedtaro.deeplinebackend.domain.notice.entity.Notice;
 import crushedtaro.deeplinebackend.domain.notice.repository.NoticeRepository;
 import crushedtaro.deeplinebackend.global.exception.CustomException;
 import crushedtaro.deeplinebackend.global.exception.ErrorCode;
+import crushedtaro.deeplinebackend.global.util.SecurityUtil;
 
 @Transactional
 @Service
@@ -26,16 +26,14 @@ public class NoticeService {
 
   private final NoticeRepository noticeRepository;
   private final MemberRepository memberRepository;
+  private final SecurityUtil securityUtil;
 
   public void createNotice(NoticeRequestDTO noticeRequestDTO) {
     log.info("[NoticeService] createNotice() START");
 
-    String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
+    String memberId = securityUtil.getCurrentMemberId();
 
-    Member author =
-        memberRepository
-            .findByMemberId(memberId)
-            .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+    Member author = securityUtil.findMemberById(memberId);
 
     Notice notice =
         Notice.builder()

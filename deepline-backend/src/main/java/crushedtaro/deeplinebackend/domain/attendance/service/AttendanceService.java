@@ -8,7 +8,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,24 +22,23 @@ import crushedtaro.deeplinebackend.domain.member.entity.Member;
 import crushedtaro.deeplinebackend.domain.member.repository.MemberRepository;
 import crushedtaro.deeplinebackend.global.exception.CustomException;
 import crushedtaro.deeplinebackend.global.exception.ErrorCode;
+import crushedtaro.deeplinebackend.global.util.SecurityUtil;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class AttendanceService {
 
+  private final SecurityUtil securityUtil;
   private final AttendanceRepository attendanceRepository;
   private final MemberRepository memberRepository;
 
   @Transactional
   public void clockIn() {
     log.info("[AttendanceService] ClockIn Start");
-    String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
+    String memberId = securityUtil.getCurrentMemberId();
 
-    Member member =
-        memberRepository
-            .findByMemberId(memberId)
-            .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+    Member member = securityUtil.findMemberById(memberId);
 
     LocalDate today = LocalDate.now();
 
@@ -66,12 +64,9 @@ public class AttendanceService {
   @Transactional
   public void clockOut() {
     log.info("[AttendanceService] ClockOut Start");
-    String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
+    String memberId = securityUtil.getCurrentMemberId();
 
-    Member member =
-        memberRepository
-            .findByMemberId(memberId)
-            .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+    Member member = securityUtil.findMemberById(memberId);
 
     LocalDate today = LocalDate.now();
 
@@ -89,12 +84,9 @@ public class AttendanceService {
   public List<AttendanceResponseDTO> getMyAttendance(int year, int month) {
     log.info("[AttendanceService] getMyAttendance Start");
 
-    String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
+    String memberId = securityUtil.getCurrentMemberId();
 
-    Member member =
-        memberRepository
-            .findByMemberId(memberId)
-            .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+    Member member = securityUtil.findMemberById(memberId);
 
     YearMonth yearMonth = YearMonth.of(year, month);
     LocalDate startDate = yearMonth.atDay(1);

@@ -4,7 +4,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,12 +24,14 @@ import crushedtaro.deeplinebackend.domain.member.repository.MemberRepository;
 import crushedtaro.deeplinebackend.domain.notification.service.NotificationProducer;
 import crushedtaro.deeplinebackend.global.exception.CustomException;
 import crushedtaro.deeplinebackend.global.exception.ErrorCode;
+import crushedtaro.deeplinebackend.global.util.SecurityUtil;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class ApprovalService {
 
+  private final SecurityUtil securityUtil;
   private final ApprovalRepository approvalRepository;
   private final MemberRepository memberRepository;
   private final AttendanceRepository attendanceRepository;
@@ -41,7 +42,7 @@ public class ApprovalService {
   public void registerApproval(ApprovalRegistDTO approvalRegistDTO) {
     log.info("[ApprovalService] registerApproval Start");
 
-    String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
+    String memberId = securityUtil.getCurrentMemberId();
 
     Member member =
         memberRepository
@@ -120,7 +121,7 @@ public class ApprovalService {
   public List<ApprovalListDTO> getSentApprovals() {
 
     log.info("[ApprovalService] getSentApprovals Start");
-    String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
+    String memberId = securityUtil.getCurrentMemberId();
 
     Member member =
         memberRepository
@@ -142,12 +143,9 @@ public class ApprovalService {
   @Transactional(readOnly = true)
   public List<ApprovalListDTO> getReceivedApprovals() {
     log.info("[ApprovalService] getReceivedApprovals Start");
-    String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
+    String memberId = securityUtil.getCurrentMemberId();
 
-    Member member =
-        memberRepository
-            .findByMemberId(memberId)
-            .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+    Member member = securityUtil.findMemberById(memberId);
 
     return approvalRepository.findWaitApprovals(member.getMemberCode()).stream()
         .map(
@@ -206,11 +204,9 @@ public class ApprovalService {
   public void processApproval(Long approvalCode, ApprovalProcessDTO approvalProcessDTO) {
     log.info("[ApprovalService] processApproval Start");
 
-    String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
-    Member approver =
-        memberRepository
-            .findByMemberId(memberId)
-            .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+    String memberId = securityUtil.getCurrentMemberId();
+
+    Member approver = securityUtil.findMemberById(memberId);
 
     Approval approval =
         approvalRepository

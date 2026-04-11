@@ -10,8 +10,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,12 +27,14 @@ import crushedtaro.deeplinebackend.domain.organization.repository.DepartmentRepo
 import crushedtaro.deeplinebackend.domain.organization.repository.PositionRepository;
 import crushedtaro.deeplinebackend.global.exception.CustomException;
 import crushedtaro.deeplinebackend.global.exception.ErrorCode;
+import crushedtaro.deeplinebackend.global.util.SecurityUtil;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class MemberService {
 
+  private final SecurityUtil securityUtil;
   private final MemberRepository memberRepository;
   private final PasswordEncoder passwordEncoder;
 
@@ -84,11 +84,11 @@ public class MemberService {
   public MemberResponseDTO getMyInfo() {
     log.info("[MemberService] getMyInfo() START");
 
-    String memberId = getCurrentMemberId();
+    String memberId = securityUtil.getCurrentMemberId();
 
     log.info("[MemberService] Current User ID : {}", memberId);
 
-    Member member = findMemberById(memberId);
+    Member member = securityUtil.findMemberById(memberId);
 
     String deptName =
         (member.getDepartment() != null) ? member.getDepartment().getDeptName() : "소속 없음";
@@ -114,11 +114,11 @@ public class MemberService {
   public void withdraw() {
     log.info("[MemberService] withdraw() START");
 
-    String memberId = getCurrentMemberId();
+    String memberId = securityUtil.getCurrentMemberId();
 
     log.info("[MemberService] Current User ID : {}", memberId);
 
-    Member member = findMemberById(memberId);
+    Member member = securityUtil.findMemberById(memberId);
 
     member.withdraw();
 
@@ -129,8 +129,8 @@ public class MemberService {
   public void updateMyInfo(UpdateMemberDTO updateMemberDTO, MultipartFile imageFile) {
     log.info("[MemberService] updateMyInfo() START");
 
-    String memberId = getCurrentMemberId();
-    Member member = findMemberById(memberId);
+    String memberId = securityUtil.getCurrentMemberId();
+    Member member = securityUtil.findMemberById(memberId);
 
     String newEmail = updateMemberDTO.memberEmail();
     if (newEmail != null && !newEmail.equals(member.getMemberEmail())) {
@@ -186,7 +186,7 @@ public class MemberService {
   public void assignMember(String memberId, MemberAssignmentDTO memberAssignmentDTO) {
     log.info("[MemberService] assignMember() START");
 
-    Member member = findMemberById(memberId);
+    Member member = securityUtil.findMemberById(memberId);
 
     Department department =
         departmentRepository
@@ -246,20 +246,5 @@ public class MemberService {
     return memberRepository.findAllByDepartment_DeptCode(departmentCode).stream()
         .map(MemberResponseDTO::from)
         .collect(Collectors.toList());
-  }
-
-  private Member findMemberById(String memberId) {
-    return memberRepository
-        .findByMemberId(memberId)
-        .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
-  }
-
-  private String getCurrentMemberId() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-    if (authentication == null || authentication.getName() == null) {
-      throw new CustomException(ErrorCode.UNAUTHORIZED_USER);
-    }
-    return authentication.getName();
   }
 }
